@@ -1,3 +1,3 @@
 # wing
 
-wiki + static site generator
+static site generator
