@@ -2,11 +2,19 @@
 use std::fs;
 
 // external
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg, SubCommand}; // local
 
 // local
+use wing_generate::WingConfig;
 
 fn main() {
+    let wing_config = match WingConfig::new() {
+        Ok(val) => val,
+        Err(e) => WingConfig {
+            ..Default::default()
+        },
+    };
+
     let app = App::new("wing")
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
