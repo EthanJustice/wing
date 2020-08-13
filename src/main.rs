@@ -7,9 +7,12 @@ use std::path::Path; // temp
 use clap::{App, Arg, SubCommand}; // local
 
 // local
-use wing_generate::{WingConfig, WingTemplate};
+use wing_generate::{delete_output_dir, generate_fs_structure, WingConfig, WingTemplate};
 
 fn main() {
+    delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
+    generate_fs_structure();
+
     let wing_config = match WingConfig::new() {
         Ok(val) => val,
         Err(e) => {
@@ -22,11 +25,8 @@ fn main() {
 
     let test = WingTemplate::new(
         // used for debugging for now
-        &Path::new(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "\\templates\\index.hbs"
-        )),
-        &Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "\\content\\index.md")),
+        &Path::new(r"\templates\index.hbs"),
+        &Path::new(r"\index.md"),
         &wing_config,
     );
 

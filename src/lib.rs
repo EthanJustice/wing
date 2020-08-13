@@ -1,7 +1,7 @@
 //! Wing data structures
 // std
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 // external
 use comrak::{markdown_to_html, ComrakExtensionOptions, ComrakOptions};
@@ -28,8 +28,8 @@ impl Default for WingConfig {
             site_map: false,
             link_type: String::from("relative"),
             optimisation_level: String::from("low"),
-            templates: String::from("templates/"),
-            content: String::from("/content"),
+            templates: String::from(r"\templates"),
+            content: String::from(r"\content"),
         }
     }
 }
@@ -79,20 +79,58 @@ impl WingTemplate {
         content: &Path,
         config: &WingConfig,
     ) -> Result<WingTemplate, std::io::Error> {
-        let content_data = fs::read_to_string(content.as_os_str())
-            .expect(&format!("Failed to read content in file {:?}.", template));
+        let content_file_path = format!(
+            r"{}{}{}",
+            get_working_directory()
+                .expect("Cannot get current working directory.")
+                .display(),
+            config.content,
+            content.display()
+        );
 
-        let completed_file_location = format!("site/{}/index.html", content.to_str().unwrap());
+        let content_file = Path::new(&content_file_path);
+
+        let content_data = match fs::read_to_string(content_file) {
+            Ok(s) => s,
+            Err(e) => {
+                println!(
+                    "Failed to read content of {}: {}",
+                    content_file.display(),
+                    e
+                );
+                std::process::exit(1)
+            }
+        };
+
+        let formatted_file = format!(r"site{}", content.display());
+
+        let with_replaced_extension = formatted_file.replace(".md", ".html");
+        let completed_file_location = Path::new(&with_replaced_extension);
+        let content_new_path = content
+            .to_str()
+            .unwrap()
+            .replace(r"\content\", r"\site\")
+            .replace("index.md", "");
+        generate_dir(&content_new_path);
 
         let mut hb = Handlebars::new();
 
-        let template_raw = fs::read_to_string(template)?;
+        let template_path_complete = format!(
+            "{}{}",
+            get_working_directory().unwrap().display(),
+            template.display()
+        );
+        let template_path_complete_as_path = Path::new(&template_path_complete);
+
+        let template_raw = fs::read_to_string(template_path_complete_as_path)
+            .expect(&format!("Failed to read {:?}", template));
         let template_name = template
             .file_name()
             .and_then(std::ffi::OsStr::to_str)
-            .unwrap();
+            .expect("Failed to generate template.");
 
-        let template = hb.register_template_file(template_name, template);
+        hb.register_template_file(template_name, template_path_complete_as_path)
+            .expect("Failed to register template.");
 
         let completed = match hb.render(
             template_name,
@@ -103,20 +141,54 @@ impl WingTemplate {
             Ok(s) => s,
             Err(e) => {
                 println!("Failed to render template: {}", e);
-                std::process::exit(1)
+                std::process::exit(1);
             }
         };
 
-        Ok(WingTemplate {
-            content_path: content.to_str().unwrap().to_string(),
-            content: content_data,
+        match fs::write(
+            completed_file_location.to_owned(),
+            completed.to_owned().as_bytes(),
+        ) {
+            Ok(()) => Ok(WingTemplate {
+                content_path: content_new_path,
+                content: content_data,
 
-            template_raw: template_raw,
+                template_raw: template_raw,
 
-            completed: completed,
-            completed_file: completed_file_location,
-        })
+                completed: completed,
+                completed_file: String::from(completed_file_location.to_str().unwrap()),
+            }),
+
+            Err(_) => {
+                println!("Failed to write template.");
+                std::process::exit(1);
+            }
+        }
     }
+}
+
+pub fn generate_fs_structure() {
+    if Path::new("./site/").is_dir() == false {
+        fs::create_dir("./site/").expect("Failed to create site directory.");
+    }
+}
+
+fn generate_dir(p: &str) {
+    if Path::new(p).is_dir() == false {
+        fs::create_dir(Path::new(p)).expect(&format!("Failed to create directory: {}", p));
+    }
+}
+
+fn get_working_directory() -> Result<PathBuf, ()> {
+    Ok(std::env::current_dir().unwrap())
+}
+
+pub fn delete_output_dir() -> std::io::Result<()> {
+    if Path::new("./site/").is_dir() == true {
+        fs::remove_dir_all(Path::new("./site/"))?;
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
