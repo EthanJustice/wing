@@ -1,11 +1,13 @@
+//! Wing is a static site generator which does everything in its power to be *very* fast.
 // std
 use std::fs;
+use std::path::Path; // temp
 
 // external
 use clap::{App, Arg, SubCommand}; // local
 
 // local
-use wing_generate::WingConfig;
+use wing_generate::{WingConfig, WingTemplate};
 
 fn main() {
     let wing_config = match WingConfig::new() {
@@ -17,6 +19,15 @@ fn main() {
             }
         }
     };
+
+    let test = WingTemplate::new(
+        &Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "\\templates\\index.hbs"
+        )),
+        &Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "\\content\\index.md")),
+        &wing_config,
+    );
 
     let app = App::new("wing")
         .version(env!("CARGO_PKG_VERSION"))
