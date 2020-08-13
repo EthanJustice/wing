@@ -4,6 +4,7 @@ use std::fs;
 use std::path::Path;
 
 // external
+use comrak::{markdown_to_html, ComrakExtensionOptions, ComrakOptions};
 use handlebars::*; // glob import for now
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
@@ -96,7 +97,7 @@ impl WingTemplate {
         let completed = match hb.render(
             template_name,
             &WingTemplateData {
-                content: content_data.to_owned(),
+                content: markdown_to_html(&content_data, &ComrakOptions::default()),
             },
         ) {
             Ok(s) => s,

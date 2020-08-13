@@ -21,6 +21,7 @@ fn main() {
     };
 
     let test = WingTemplate::new(
+        // used for debugging for now
         &Path::new(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "\\templates\\index.hbs"
