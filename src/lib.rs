@@ -7,12 +7,14 @@ use serde::{Deserialize, Serialize};
 use serde_json::from_str;
 
 #[derive(Deserialize, Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct WingConfig {
     pub rss: bool,
     pub site_map: bool,
     pub link_type: String,
     pub optimisation_level: String,
+    pub templates: String,
+    pub content: String,
 }
 
 impl Default for WingConfig {
@@ -22,6 +24,8 @@ impl Default for WingConfig {
             site_map: false,
             link_type: String::from("relative"),
             optimisation_level: String::from("low"),
+            templates: String::from("templates/"),
+            content: String::from("/content"),
         }
     }
 }
@@ -61,6 +65,8 @@ mod tests {
                 assert_eq!(defaults.site_map, val.site_map);
                 assert_eq!(defaults.link_type, val.link_type);
                 assert_eq!(defaults.optimisation_level, val.optimisation_level);
+                assert_eq!(defaults.templates, val.templates);
+                assert_eq!(defaults.content, val.content);
             }
             Err(e) => {
                 assert_eq!(true, false, "WingConfig::new() failed: {}", e);
