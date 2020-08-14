@@ -9,6 +9,10 @@ use handlebars::*; // glob import for now
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
 
+// local
+mod utils;
+use utils::{generate_dir, generate_fs_structure, get_working_directory};
+
 /// Represents a Wing configuration file
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase", default)]
@@ -165,22 +169,6 @@ impl WingTemplate {
             }
         }
     }
-}
-
-pub fn generate_fs_structure() {
-    if Path::new("./site/").is_dir() == false {
-        fs::create_dir("./site/").expect("Failed to create site directory.");
-    }
-}
-
-fn generate_dir(p: &str) {
-    if Path::new(p).is_dir() == false {
-        fs::create_dir(Path::new(p)).expect(&format!("Failed to create directory: {}", p));
-    }
-}
-
-fn get_working_directory() -> Result<PathBuf, ()> {
-    Ok(std::env::current_dir().unwrap())
 }
 
 pub fn delete_output_dir() -> std::io::Result<()> {

@@ -9,7 +9,11 @@ use clap::{App, Arg, SubCommand}; // local
 // local
 mod new;
 use new::*;
-use wing_generate::{delete_output_dir, generate_fs_structure, WingConfig, WingTemplate};
+
+mod utils;
+use utils::generate_fs_structure;
+
+use wing_generate::{delete_output_dir, WingConfig, WingTemplate};
 
 fn main() {
     delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
