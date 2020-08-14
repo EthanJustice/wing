@@ -2,5 +2,7 @@
     "rss": false,
     "siteMap": false,
     "linkType": "relative",
-    "optimisationLevel": "low"
+    "optimisationLevel": "low",
+    "content": "\\content",
+    "templates": "\\templates"
 }

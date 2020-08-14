@@ -7,6 +7,8 @@ use std::path::Path; // temp
 use clap::{App, Arg, SubCommand}; // local
 
 // local
+mod new;
+use new::*;
 use wing_generate::{delete_output_dir, generate_fs_structure, WingConfig, WingTemplate};
 
 fn main() {
@@ -23,27 +25,33 @@ fn main() {
         }
     };
 
-    let test = WingTemplate::new(
-        // used for debugging for now
-        &Path::new(r"\templates\index.hbs"),
-        &Path::new(r"\index.md"),
-        &wing_config,
-    );
-
     let app = App::new("wing")
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .subcommand(
             SubCommand::with_name("build")
-                .about("Builds your site")
+                .about("Builds your site.")
+                .version(env!("CARGO_PKG_VERSION"))
+                .author(env!("CARGO_PKG_AUTHORS")),
+        )
+        .subcommand(
+            SubCommand::with_name("new")
+                .about("Create a new wing project.")
                 .version(env!("CARGO_PKG_VERSION"))
                 .author(env!("CARGO_PKG_AUTHORS")),
         )
         .get_matches();
 
     if let Some(v) = app.subcommand_matches("build") {
-        println!("V: {:?}", v); // debug
-        println!("Called build!");
+        println!("Called build: {:?}", v); // debug
+        let test = WingTemplate::new(
+            // used for debugging for now
+            &Path::new(r"\templates\index.hbs"),
+            &Path::new(r"\index.md"),
+            &wing_config,
+        );
+    } else if let Some(v) = app.subcommand_matches("new") {
+        println!("Called new: {:?}", v);
     }
 }
