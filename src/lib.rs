@@ -1,7 +1,7 @@
 //! Wing data structures
 // std
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 // external
 use comrak::{markdown_to_html, ComrakExtensionOptions, ComrakOptions};
@@ -11,7 +11,7 @@ use serde_json::from_str;
 
 // local
 mod utils;
-use utils::{generate_dir, generate_fs_structure, get_working_directory};
+use utils::{generate_dir, get_working_directory};
 
 /// Represents a Wing configuration file
 #[derive(Deserialize, Serialize, Debug)]

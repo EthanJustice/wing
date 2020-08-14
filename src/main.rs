@@ -1,6 +1,5 @@
 //! Wing is a static site generator which does everything in its power to be *very* fast.
 // std
-use std::fs;
 use std::path::Path; // temp
 
 // external
@@ -8,16 +7,12 @@ use clap::{App, Arg, SubCommand}; // local
 
 // local
 mod new;
-use new::*;
-
-mod utils;
-use utils::generate_fs_structure;
+use new::new::generate_new;
 
 use wing_generate::{delete_output_dir, WingConfig, WingTemplate};
 
 fn main() {
     delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
-    generate_fs_structure();
 
     let wing_config = match WingConfig::new() {
         Ok(val) => val,
@@ -43,13 +38,20 @@ fn main() {
             SubCommand::with_name("new")
                 .about("Create a new wing project.")
                 .version(env!("CARGO_PKG_VERSION"))
-                .author(env!("CARGO_PKG_AUTHORS")),
+                .author(env!("CARGO_PKG_AUTHORS"))
+                .arg(
+                    Arg::with_name("name")
+                        .allow_hyphen_values(true)
+                        .default_value("site")
+                        .help("The name of the site you want to create")
+                        .number_of_values(1),
+                ),
         )
         .get_matches();
 
     if let Some(v) = app.subcommand_matches("build") {
         println!("Called build: {:?}", v); // debug
-        let test = WingTemplate::new(
+        let _test = WingTemplate::new(
             // used for debugging for now
             &Path::new(r"\templates\index.hbs"),
             &Path::new(r"\index.md"),
@@ -57,5 +59,17 @@ fn main() {
         );
     } else if let Some(v) = app.subcommand_matches("new") {
         println!("Called new: {:?}", v);
+        match generate_new(v.value_of("name").unwrap()) {
+            Ok(()) => {
+                println!(
+                    "Successfully created project {}!",
+                    v.value_of("name").unwrap()
+                );
+            }
+            Err(e) => {
+                println!("ERROR: Failed to create new project: {}", e);
+                std::process::exit(1);
+            }
+        };
     }
 }
