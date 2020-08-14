@@ -1,4 +1,4 @@
-//! Wing data structures
+//! Wing core
 // std
 use std::fs;
 use std::path::Path;
@@ -17,11 +17,19 @@ use utils::{generate_dir, get_working_directory};
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase", default)]
 pub struct WingConfig {
+    /// If `true`, generates an RSS feed
     pub rss: bool,
+    /// If `true`, generate a .xml sitemap
     pub site_map: bool,
+    /// Values: `absolute`, `relative`
+    /// Determines the type of link to use in **all** files
     pub link_type: String,
+    /// Values: `low`, `medium`, `high`
+    /// Determines the level of optimisation to run the new site through
     pub optimisation_level: String,
+    /// Path to template directory
     pub templates: String,
+    /// Path to content directory
     pub content: String,
 }
 
@@ -57,23 +65,26 @@ impl WingConfig {
     }
 }
 
-pub struct BuildAssets {
-    content: String,
-    content_files: Vec<String>,
-}
-
+/// Custom templating data
 #[derive(Serialize)]
 pub struct WingTemplateData {
+    /// Raw MarkDown
     pub content: String,
 }
 
+/// Represents a template
 pub struct WingTemplate {
+    /// Raw MarkDown
     pub content: String,
+    /// Path to raw MarkDown
     pub content_path: String,
 
+    /// Raw template content
     pub template_raw: String,
 
+    /// Completed content (content + template)
     pub completed: String,
+    /// Path to completed file
     pub completed_file: String,
 }
 
@@ -171,6 +182,7 @@ impl WingTemplate {
     }
 }
 
+/// Removes the previous site
 pub fn delete_output_dir() -> std::io::Result<()> {
     if Path::new("./site/").is_dir() == true {
         fs::remove_dir_all(Path::new("./site/"))?;
