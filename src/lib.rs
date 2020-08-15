@@ -24,13 +24,9 @@ pub struct WingConfig {
     /// Values: `absolute`, `relative`
     /// Determines the type of link to use in **all** files
     pub link_type: String,
-    /// Values: `low`, `medium`, `high`
+    /// Values: `none`, `low`, `high`
     /// Determines the level of optimisation to run the new site through
     pub optimisation_level: String,
-    /// Path to template directory
-    pub templates: String,
-    /// Path to content directory
-    pub content: String,
 }
 
 impl Default for WingConfig {
@@ -39,9 +35,7 @@ impl Default for WingConfig {
             rss: false,
             site_map: false,
             link_type: String::from("relative"),
-            optimisation_level: String::from("low"),
-            templates: String::from(r"\templates"),
-            content: String::from(r"\content"),
+            optimisation_level: String::from("none"),
         }
     }
 }
@@ -95,11 +89,10 @@ impl WingTemplate {
         config: &WingConfig,
     ) -> Result<WingTemplate, std::io::Error> {
         let content_file_path = format!(
-            r"{}{}{}",
+            r"{}/content/{}",
             get_working_directory()
                 .expect("Cannot get current working directory.")
                 .display(),
-            config.content,
             content.display()
         );
 
