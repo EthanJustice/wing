@@ -1,5 +1,6 @@
 //! Wing is a static site generator which does everything in its power to be *very* fast.
 // std
+use std::fs;
 use std::path::Path; // temp
 
 // external
@@ -55,11 +56,13 @@ fn main() {
         .get_matches();
 
     if let Some(v) = app.subcommand_matches("build") {
+        fs::create_dir(Path::new(&format!("./site/"))).unwrap();
+
         println!("Called build: {:?}", v); // debug
         let _test = WingTemplate::new(
             // used for debugging for now
-            &Path::new(r"\templates\index.hbs"),
-            &Path::new(r"\index.md"),
+            &Path::new("/templates/index.hbs"),
+            &Path::new("/index.md"),
             &wing_config,
         );
     } else if let Some(v) = app.subcommand_matches("new") {

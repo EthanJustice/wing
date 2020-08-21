@@ -52,7 +52,7 @@ impl WingConfig {
     pub fn new() -> std::result::Result<WingConfig, std::io::Error> {
         let config_raw = fs::read_to_string(Path::new(&concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "\\wing.json"
+            "./wing.json"
         )));
 
         match config_raw {
@@ -96,7 +96,7 @@ impl WingTemplate {
         config: &WingConfig,
     ) -> std::result::Result<WingTemplate, std::io::Error> {
         let content_file_path = format!(
-            r"{}\content{}",
+            r"{}/content{}",
             get_working_directory()
                 .expect("Cannot get current working directory.")
                 .display(),
@@ -121,14 +121,16 @@ impl WingTemplate {
             }
         };
 
-        let formatted_file = format!(r"site{}", content.display());
+        let formatted_file = format!("./site{}", content.display());
 
         let with_replaced_extension = formatted_file.replace(".md", ".html");
+
         let completed_file_location = Path::new(&with_replaced_extension);
+
         let content_new_path = content
             .to_str()
             .unwrap()
-            .replace(r"\content\", r"\site\")
+            .replace("./content/", "./site/")
             .replace("index.md", "");
         generate_dir(&content_new_path);
 
@@ -139,6 +141,7 @@ impl WingTemplate {
             get_working_directory().unwrap().display(),
             template.display()
         );
+
         let template_path_complete_as_path = Path::new(&template_path_complete);
 
         let template_raw = fs::read_to_string(template_path_complete_as_path)
@@ -151,10 +154,12 @@ impl WingTemplate {
         hb.register_template_file(template_name, template_path_complete_as_path)
             .expect("Failed to register template.");
 
+        let mut options = ComrakOptions::default();
+        options.render.unsafe_ = true;
         let completed = match hb.render(
             template_name,
             &WingTemplateData {
-                content: markdown_to_html(&content_data, &ComrakOptions::default()),
+                content: markdown_to_html(&content_data, &options),
             },
         ) {
             Ok(s) => s,
@@ -178,8 +183,16 @@ impl WingTemplate {
                 completed_file: String::from(completed_file_location.to_str().unwrap()),
             }),
 
-            Err(_) => {
-                log(&format!("Failed to write template."), "f").unwrap();
+            Err(e) => {
+                log(
+                    &format!(
+                        "Failed to write template in {}.  Error: {}",
+                        completed_file_location.to_str().unwrap(),
+                        e
+                    ),
+                    "f",
+                )
+                .unwrap();
                 std::process::exit(1);
             }
         }
