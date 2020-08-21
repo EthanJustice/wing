@@ -1,10 +1,17 @@
 //! Wing core
 // std
 use std::fs;
+use std::io::{stdout, Write};
 use std::path::Path;
 
 // external
 use comrak::{markdown_to_html, ComrakExtensionOptions, ComrakOptions};
+use crossterm::{
+    execute,
+    style::{style, Color, Print, StyledContent},
+    terminal::SetTitle,
+    Result,
+};
 use handlebars::*; // glob import for now
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
@@ -42,7 +49,7 @@ impl Default for WingConfig {
 
 impl WingConfig {
     /// Generates a new WingConfig, using the wing.json configuration file.  This is a temporary solution.
-    pub fn new() -> Result<WingConfig, std::io::Error> {
+    pub fn new() -> std::result::Result<WingConfig, std::io::Error> {
         let config_raw = fs::read_to_string(Path::new(&concat!(
             env!("CARGO_MANIFEST_DIR"),
             "\\wing.json"
@@ -87,9 +94,9 @@ impl WingTemplate {
         template: &Path,
         content: &Path,
         config: &WingConfig,
-    ) -> Result<WingTemplate, std::io::Error> {
+    ) -> std::result::Result<WingTemplate, std::io::Error> {
         let content_file_path = format!(
-            r"{}/content/{}",
+            r"{}\content{}",
             get_working_directory()
                 .expect("Cannot get current working directory.")
                 .display(),
@@ -101,11 +108,15 @@ impl WingTemplate {
         let content_data = match fs::read_to_string(content_file) {
             Ok(s) => s,
             Err(e) => {
-                println!(
-                    "Failed to read content of {}: {}",
-                    content_file.display(),
-                    e
-                );
+                log(
+                    &format!(
+                        "Failed to read content of {}: {}",
+                        content_file.display(),
+                        e
+                    ),
+                    "f",
+                )
+                .unwrap();
                 std::process::exit(1)
             }
         };
@@ -148,7 +159,7 @@ impl WingTemplate {
         ) {
             Ok(s) => s,
             Err(e) => {
-                println!("Failed to render template: {}", e);
+                log(&format!("Failed to render template: {}", e), "f").unwrap();
                 std::process::exit(1);
             }
         };
@@ -168,7 +179,7 @@ impl WingTemplate {
             }),
 
             Err(_) => {
-                println!("Failed to write template.");
+                log(&format!("Failed to write template."), "f").unwrap();
                 std::process::exit(1);
             }
         }
@@ -182,6 +193,22 @@ pub fn delete_output_dir() -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+pub fn log(message: &String, message_type: &str) -> Result<()> {
+    match message_type {
+        "f" => execute!(
+            stdout(),
+            Print(style("ERROR: ").with(Color::Red)),
+            Print(style(message))
+        ),
+        "s" => execute!(
+            stdout(),
+            Print(style("SUCESS: ").with(Color::Green)),
+            Print(style(message))
+        ),
+        _ => Ok(()),
+    }
 }
 
 #[cfg(test)]

@@ -3,13 +3,14 @@
 use std::path::Path; // temp
 
 // external
-use clap::{App, Arg, SubCommand}; // local
+use clap::{App, Arg, SubCommand};
+use crossterm::style::{style, Color};
 
 // local
 mod new;
 use new::new::generate_new;
 
-use wing_generate::{delete_output_dir, WingConfig, WingTemplate};
+use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 
 fn main() {
     delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
@@ -17,7 +18,11 @@ fn main() {
     let wing_config = match WingConfig::new() {
         Ok(val) => val,
         Err(e) => {
-            println!("Using defaults for Wing config.  Error: {}", e);
+            log(
+                &format!("Using defaults for Wing config.  Error: {}", e),
+                "f",
+            )
+            .unwrap();
             WingConfig {
                 ..Default::default()
             }
@@ -61,13 +66,17 @@ fn main() {
         println!("Called new: {:?}", v);
         match generate_new(v.value_of("name").unwrap()) {
             Ok(()) => {
-                println!(
-                    "Successfully created project {}!",
-                    v.value_of("name").unwrap()
-                );
+                log(
+                    &format!(
+                        "Successfully created project {}!",
+                        v.value_of("name").unwrap()
+                    ),
+                    "s",
+                )
+                .unwrap();
             }
             Err(e) => {
-                println!("ERROR: Failed to create new project: {}", e);
+                log(&format!("ERROR: Failed to create new project: {}", e), "f").unwrap();
                 std::process::exit(1);
             }
         };
