@@ -2,7 +2,14 @@
 
 static site generator
 
++ [Instal](#install)
 + [Usage](#usage)
+
+## Install
+
+For now, as Wing is not on `crates.io` and CI hasn't been set up, installation has to be done through Cargo.
+
+`cargo install --git https://github.com/EthanJustice/wing.git`
 
 ## Usage
 
