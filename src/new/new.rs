@@ -2,6 +2,12 @@
 use std::fs;
 use std::path::Path;
 
+// external
+use serde_json::to_string_pretty;
+
+// local
+use wing_generate::WingConfig;
+
 /// Creates a new output directory, where the results of the build process will go
 fn generate_output_dir(name: &str) -> Result<(), std::io::Error> {
     fs::create_dir(Path::new(&format!("./{}/site/", name)))
@@ -27,6 +33,15 @@ fn generate_template_index(name: &str) -> Result<(), std::io::Error> {
     fs::write(Path::new(&format!("./{}/templates/index.hbs", name)), "")
 }
 
+fn generate_default_config(name: &str) -> Result<(), std::io::Error> {
+    fs::write(
+        Path::new(&format!("./{}/wing.json", name)),
+        to_string_pretty(&WingConfig {
+            ..Default::default()
+        })?,
+    )
+}
+
 /// Scaffolding that generates a new skeleton Wing site
 pub fn generate_new(name: &str) -> Result<(), std::io::Error> {
     fs::create_dir(Path::new(&format!("./{}/", name)))?;
@@ -38,6 +53,8 @@ pub fn generate_new(name: &str) -> Result<(), std::io::Error> {
 
     generate_template_dir(name)?;
     generate_template_index(name)?;
+
+    generate_default_config(name)?;
 
     Ok(())
 }
