@@ -129,7 +129,7 @@ impl WingTemplate {
 
         let parent = completed_file_location.parent().unwrap();
         if parent.is_dir() == false {
-            fs::create_dir_all(parent).expect("Failed to create directories.");
+            fs::create_dir_all(parent)?;
         }
 
         let mut hb = Handlebars::new();
@@ -203,19 +203,19 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
     match message_type {
         "f" => execute!(
             stdout(),
-            Print(style("ERROR: ").with(Color::Red)),
+            Print(style("ERROR      ").with(Color::Red)),
             Print(style(message)),
             Print("\n")
         ),
         "s" => execute!(
             stdout(),
-            Print(style("SUCESS: ").with(Color::Green)),
+            Print(style("SUCESS     ").with(Color::Green)),
             Print(style(message)),
             Print("\n")
         ),
         "i" => execute!(
             stdout(),
-            Print(style("INDEXING ").with(Color::Cyan)),
+            Print(style("INDEXING   ").with(Color::Cyan)),
             Print(style(message)),
             Print("\n")
         ),
@@ -225,7 +225,13 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
             Print(style(message)),
             Print("\n")
         ),
-        _ => execute!(stdout(), Print(style(message))),
+        "b" => execute!(
+            stdout(),
+            Print(style("BUILT      ").with(Color::Yellow)),
+            Print(style(message)),
+            Print("\n")
+        ),
+        _ => execute!(stdout(), Print(style(message)), Print("\n")),
     }
 }
 

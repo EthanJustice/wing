@@ -61,14 +61,31 @@ fn main() {
 
     if let Some(v) = app.subcommand_matches("build") {
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
-        log(&String::from("Content..."), "i").unwrap();
+        log(&String::from("content..."), "i").unwrap();
         for entry in WalkDir::new("content").min_depth(1) {
             let file = entry.expect("Failed to read file.");
             let path = file.path();
             if path.is_file() == true && path.extension().unwrap() == "md" {
-                WingTemplate::new(Path::new(r"\templates\index.hbs"), path, &wing_config);
+                match WingTemplate::new(Path::new(r"\templates\index.hbs"), path, &wing_config) {
+                    Ok(_template) => {
+                        log(
+                            &String::from(
+                                path.to_str()
+                                    .unwrap()
+                                    .replacen("content\\", "", 1)
+                                    .replacen(".md", "", 1),
+                            ),
+                            "b",
+                        )
+                        .unwrap();
+                    }
+                    Err(e) => {
+                        log(&String::from(e.to_string()), "f").unwrap();
+                    }
+                };
             }
         }
+        log(&String::from("completed building"), "s");
     } else if let Some(v) = app.subcommand_matches("new") {
         log(&String::from("new project"), "g").unwrap();
         match generate_new(v.value_of("name").unwrap()) {
