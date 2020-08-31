@@ -6,10 +6,14 @@ use std::path::Path; // temp
 // external
 use clap::{App, Arg, SubCommand};
 use crossterm::style::{style, Color};
+use walkdir::WalkDir;
 
 // local
 mod new;
 use new::new::generate_new;
+
+mod utils;
+use utils::get_working_directory;
 
 use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 
@@ -57,29 +61,26 @@ fn main() {
 
     if let Some(v) = app.subcommand_matches("build") {
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
-
-        println!("Called build: {:?}", v); // debug
-        let _test = WingTemplate::new(
-            // used for debugging for now
-            &Path::new("/templates/index.hbs"),
-            &Path::new("/index.md"),
-            &wing_config,
-        );
+        log(&String::from("content"), "i");
+        for entry in WalkDir::new("content").min_depth(1) {
+            let file = entry.expect("Failed to read file.");
+            let path = file.path();
+            if path.is_file() == true && path.extension().unwrap() == "md" {
+                WingTemplate::new(Path::new(r"\templates\index.hbs"), path, &wing_config);
+            }
+        }
     } else if let Some(v) = app.subcommand_matches("new") {
         println!("Called new: {:?}", v);
         match generate_new(v.value_of("name").unwrap()) {
             Ok(()) => {
                 log(
-                    &format!(
-                        "Successfully created project {}!",
-                        v.value_of("name").unwrap()
-                    ),
+                    &format!("Created project {}!", v.value_of("name").unwrap()),
                     "s",
                 )
                 .unwrap();
             }
             Err(e) => {
-                log(&format!("ERROR: Failed to create new project: {}", e), "f").unwrap();
+                log(&format!("failed to create new project: {}", e), "f").unwrap();
                 std::process::exit(1);
             }
         };

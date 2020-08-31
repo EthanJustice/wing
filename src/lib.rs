@@ -79,10 +79,6 @@ pub struct WingTemplate {
     pub content: String,
     /// Path to raw MarkDown
     pub content_path: String,
-
-    /// Raw template content
-    pub template_raw: String,
-
     /// Completed content (content + template)
     pub completed: String,
     /// Path to completed file
@@ -96,7 +92,7 @@ impl WingTemplate {
         config: &WingConfig,
     ) -> std::result::Result<WingTemplate, std::io::Error> {
         let content_file_path = format!(
-            r"{}/content{}",
+            r"{}\{}",
             get_working_directory()
                 .expect("Cannot get current working directory.")
                 .display(),
@@ -121,18 +117,22 @@ impl WingTemplate {
             }
         };
 
-        let formatted_file = format!("./site{}", content.display());
+        let with_replaced_extension = content.with_extension("html");
 
-        let with_replaced_extension = formatted_file.replace(".md", ".html");
+        let completed_file_location =
+            Path::new("site\\").join(with_replaced_extension.strip_prefix("content/").expect(
+                &format!(
+                    "Failed to generate new content location.  Computed content location: {}",
+                    with_replaced_extension.display()
+                ),
+            ));
 
-        let completed_file_location = Path::new(&with_replaced_extension);
+        let parent = completed_file_location.parent().unwrap();
+        if parent.is_dir() == false {
+            fs::create_dir_all(parent).expect("Failed to create directories.");
+        }
 
-        let content_new_path = content
-            .to_str()
-            .unwrap()
-            .replace("./content/", "./site/")
-            .replace("index.md", "");
-        generate_dir(&content_new_path);
+        println!("\nCOMPLETED: {}", completed_file_location.to_str().unwrap());
 
         let mut hb = Handlebars::new();
 
@@ -143,29 +143,33 @@ impl WingTemplate {
         );
 
         let template_path_complete_as_path = Path::new(&template_path_complete);
+        let template_name = template.file_stem().unwrap().to_str().unwrap();
 
-        let template_raw = fs::read_to_string(template_path_complete_as_path)
-            .expect(&format!("Failed to read {:?}", template));
-        let template_name = template
-            .file_name()
-            .and_then(std::ffi::OsStr::to_str)
-            .expect("Failed to generate template.");
+        println!(
+            "TEMPLATE: {:?} | NAME: {}",
+            template_path_complete_as_path, template_name
+        );
 
         hb.register_template_file(template_name, template_path_complete_as_path)
             .expect("Failed to register template.");
 
         let mut options = ComrakOptions::default();
         options.render.unsafe_ = true;
+
         let completed = match hb.render(
             template_name,
             &WingTemplateData {
                 content: markdown_to_html(&content_data, &options),
             },
         ) {
-            Ok(s) => s,
+            Ok(s) => {
+                println!("DATA: {}", s);
+                s
+            }
             Err(e) => {
                 log(&format!("Failed to render template: {}", e), "f").unwrap();
-                std::process::exit(1);
+                String::new()
+                //                std::process::exit(1);
             }
         };
 
@@ -174,10 +178,8 @@ impl WingTemplate {
             completed.to_owned().as_bytes(),
         ) {
             Ok(()) => Ok(WingTemplate {
-                content_path: content_new_path,
+                content_path: String::from(parent.to_str().unwrap()),
                 content: content_data,
-
-                template_raw: template_raw,
 
                 completed: completed,
                 completed_file: String::from(completed_file_location.to_str().unwrap()),
@@ -186,7 +188,7 @@ impl WingTemplate {
             Err(e) => {
                 log(
                     &format!(
-                        "Failed to write template in {}.  Error: {}",
+                        "Failed to write completed file in {}.  Error: {}",
                         completed_file_location.to_str().unwrap(),
                         e
                     ),
@@ -218,6 +220,11 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
         "s" => execute!(
             stdout(),
             Print(style("SUCESS: ").with(Color::Green)),
+            Print(style(message))
+        ),
+        "i" => execute!(
+            stdout(),
+            Print(style("INDEXING ").with(Color::Cyan)),
             Print(style(message))
         ),
         _ => Ok(()),
