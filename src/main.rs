@@ -61,7 +61,7 @@ fn main() {
 
     if let Some(v) = app.subcommand_matches("build") {
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
-        log(&String::from("content"), "i");
+        log(&String::from("Content..."), "i").unwrap();
         for entry in WalkDir::new("content").min_depth(1) {
             let file = entry.expect("Failed to read file.");
             let path = file.path();
@@ -70,7 +70,7 @@ fn main() {
             }
         }
     } else if let Some(v) = app.subcommand_matches("new") {
-        println!("Called new: {:?}", v);
+        log(&String::from("new project"), "g").unwrap();
         match generate_new(v.value_of("name").unwrap()) {
             Ok(()) => {
                 log(

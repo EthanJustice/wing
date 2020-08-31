@@ -132,8 +132,6 @@ impl WingTemplate {
             fs::create_dir_all(parent).expect("Failed to create directories.");
         }
 
-        println!("\nCOMPLETED: {}", completed_file_location.to_str().unwrap());
-
         let mut hb = Handlebars::new();
 
         let template_path_complete = format!(
@@ -144,11 +142,6 @@ impl WingTemplate {
 
         let template_path_complete_as_path = Path::new(&template_path_complete);
         let template_name = template.file_stem().unwrap().to_str().unwrap();
-
-        println!(
-            "TEMPLATE: {:?} | NAME: {}",
-            template_path_complete_as_path, template_name
-        );
 
         hb.register_template_file(template_name, template_path_complete_as_path)
             .expect("Failed to register template.");
@@ -162,14 +155,10 @@ impl WingTemplate {
                 content: markdown_to_html(&content_data, &options),
             },
         ) {
-            Ok(s) => {
-                println!("DATA: {}", s);
-                s
-            }
+            Ok(s) => s,
             Err(e) => {
                 log(&format!("Failed to render template: {}", e), "f").unwrap();
-                String::new()
-                //                std::process::exit(1);
+                std::process::exit(1);
             }
         };
 
@@ -215,19 +204,28 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
         "f" => execute!(
             stdout(),
             Print(style("ERROR: ").with(Color::Red)),
-            Print(style(message))
+            Print(style(message)),
+            Print("\n")
         ),
         "s" => execute!(
             stdout(),
             Print(style("SUCESS: ").with(Color::Green)),
-            Print(style(message))
+            Print(style(message)),
+            Print("\n")
         ),
         "i" => execute!(
             stdout(),
             Print(style("INDEXING ").with(Color::Cyan)),
-            Print(style(message))
+            Print(style(message)),
+            Print("\n")
         ),
-        _ => Ok(()),
+        "g" => execute!(
+            stdout(),
+            Print(style("GENERATING ").with(Color::Cyan)),
+            Print(style(message)),
+            Print("\n")
+        ),
+        _ => execute!(stdout(), Print(style(message))),
     }
 }
 
