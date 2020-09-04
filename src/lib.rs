@@ -18,7 +18,7 @@ use serde_json::from_str;
 
 // local
 mod utils;
-use utils::{generate_dir, get_working_directory};
+use utils::get_working_directory;
 
 /// Represents a Wing configuration file
 #[derive(Deserialize, Serialize, Debug)]

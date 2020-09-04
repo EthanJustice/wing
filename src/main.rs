@@ -13,7 +13,6 @@ mod new;
 use new::new::generate_new;
 
 mod utils;
-use utils::get_working_directory;
 
 use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 
@@ -59,7 +58,7 @@ fn main() {
         )
         .get_matches();
 
-    if let Some(v) = app.subcommand_matches("build") {
+    if let Some(_v) = app.subcommand_matches("build") {
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
         log(&String::from("content..."), "i").unwrap();
         for entry in WalkDir::new("content").min_depth(1) {
@@ -85,7 +84,7 @@ fn main() {
                 };
             }
         }
-        log(&String::from("completed building"), "s");
+        log(&String::from("completed building"), "s").unwrap();
     } else if let Some(v) = app.subcommand_matches("new") {
         log(&String::from("new project"), "g").unwrap();
         match generate_new(v.value_of("name").unwrap()) {
