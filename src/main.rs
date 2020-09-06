@@ -61,11 +61,25 @@ fn main() {
     if let Some(_v) = app.subcommand_matches("build") {
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
         log(&String::from("content..."), "i").unwrap();
+        let mut index = Vec::new();
         for entry in WalkDir::new("content").min_depth(1) {
             let file = entry.expect("Failed to read file.");
             let path = file.path();
             if path.is_file() == true && path.extension().unwrap() == "md" {
-                match WingTemplate::new(Path::new(r"\templates\index.hbs"), path, &wing_config) {
+                index.push(String::from(file.path().to_str().unwrap()));
+            }
+        }
+
+        for entry in WalkDir::new("content").min_depth(1) {
+            let file = entry.expect("Failed to read file.");
+            let path = file.path();
+            if path.is_file() == true && path.extension().unwrap() == "md" {
+                match WingTemplate::new(
+                    Path::new(r"\templates\index.hbs"),
+                    path,
+                    &wing_config,
+                    &index,
+                ) {
                     Ok(_template) => {
                         log(
                             &String::from(

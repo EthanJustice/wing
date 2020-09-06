@@ -71,6 +71,8 @@ impl WingConfig {
 pub struct WingTemplateData {
     /// Raw MarkDown
     pub content: String,
+    /// List of item paths
+    pub items: Vec<String>,
 }
 
 /// Represents a template
@@ -90,6 +92,7 @@ impl WingTemplate {
         template: &Path,
         content: &Path,
         config: &WingConfig,
+        index: &Vec<String>,
     ) -> std::result::Result<WingTemplate, std::io::Error> {
         let content_file_path = format!(
             r"{}\{}",
@@ -153,6 +156,7 @@ impl WingTemplate {
             template_name,
             &WingTemplateData {
                 content: markdown_to_html(&content_data, &options),
+                items: index.clone(),
             },
         ) {
             Ok(s) => s,
