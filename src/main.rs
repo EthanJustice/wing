@@ -1,7 +1,8 @@
 //! Wing is a static site generator which does everything in its power to be *very* fast.
 // std
 use std::fs;
-use std::path::Path; // temp
+use std::path::Path;
+use std::time::Instant;
 
 // external
 use clap::{App, Arg, SubCommand};
@@ -17,6 +18,7 @@ mod utils;
 use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 
 fn main() {
+    let total_timing = Instant::now();
     delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
 
     let wing_config = match WingConfig::new() {
@@ -60,6 +62,7 @@ fn main() {
 
     if let Some(_v) = app.subcommand_matches("build") {
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
+        let index_timing = Instant::now();
         log(&String::from("content..."), "i").unwrap();
         let mut index = Vec::new();
         for entry in WalkDir::new("content").min_depth(1) {
@@ -73,8 +76,17 @@ fn main() {
                 );
             }
         }
+        log(
+            &format!(
+                "content indexing in {}ms",
+                index_timing.elapsed().as_millis()
+            ),
+            "c",
+        )
+        .unwrap();
 
         for entry in WalkDir::new("content").min_depth(1) {
+            let entry_timing = Instant::now();
             let file = entry.expect("Failed to read file.");
             let path = file.path();
             if path.is_file() == true && path.extension().unwrap() == "md" {
@@ -86,11 +98,13 @@ fn main() {
                 ) {
                     Ok(_template) => {
                         log(
-                            &String::from(
+                            &format!(
+                                "{} in {}ms",
                                 path.to_str()
                                     .unwrap()
                                     .replacen("content\\", "", 1)
                                     .replacen(".md", "", 1),
+                                entry_timing.elapsed().as_millis()
                             ),
                             "b",
                         )
@@ -102,7 +116,14 @@ fn main() {
                 };
             }
         }
-        log(&String::from("completed building"), "s").unwrap();
+        log(
+            &format!(
+                "completed building in {}ms",
+                total_timing.elapsed().as_millis()
+            ),
+            "s",
+        )
+        .unwrap();
     } else if let Some(v) = app.subcommand_matches("new") {
         log(&String::from("new project"), "g").unwrap();
         match generate_new(v.value_of("name").unwrap()) {

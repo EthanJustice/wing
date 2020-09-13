@@ -235,6 +235,12 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
             Print(style(message)),
             Print("\n")
         ),
+        "c" => execute!(
+            stdout(),
+            Print(style("COMPLETED  ").with(Color::Green)),
+            Print(style(message)),
+            Print("\n")
+        ),
         _ => execute!(stdout(), Print(style(message)), Print("\n")),
     }
 }
