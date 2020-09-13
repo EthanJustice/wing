@@ -2,12 +2,12 @@
 
 static site generator
 
-+ [Instal](#install)
++ [Install](#install)
 + [Usage](#usage)
 
 ## Install
 
-For now, as Wing is not on `crates.io` and CI hasn't been set up, installation has to be done through Cargo.
+For now, as Wing is not on [`crates.io`](https://crates.io/) and CI hasn't been set up, installation has to be done through Cargo.
 
 `cargo install --git https://github.com/EthanJustice/wing.git`
 
@@ -28,3 +28,11 @@ SUBCOMMANDS:
     help     Prints this message or the help of the given subcommand(s)
     new      Create a new wing project.
 ```
+
+For now, `wing` doesn't support custom templates.  You can only use `index.hbs` for generation.
+
+### Custom Metadata
+
+For now, `wing` doesn't support custom metadata, although it provides a small amount that can be used in templates.  `custom` contains the MarkDown of the current file in HTML; `items` contains the index of files.
+
+### Wing Config
