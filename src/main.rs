@@ -66,7 +66,11 @@ fn main() {
             let file = entry.expect("Failed to read file.");
             let path = file.path();
             if path.is_file() == true && path.extension().unwrap() == "md" {
-                index.push(String::from(file.path().to_str().unwrap()));
+                index.push(
+                    String::from(file.path().to_str().unwrap())
+                        .replace("content\\", "")
+                        .replace(".md", ""),
+                );
             }
         }
 
