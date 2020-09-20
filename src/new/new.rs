@@ -35,7 +35,7 @@ fn generate_template_index(name: &str) -> Result<(), std::io::Error> {
 
 fn generate_default_config(name: &str) -> Result<(), std::io::Error> {
     fs::write(
-        Path::new(&format!("./{}/wing.json", name)),
+        Path::new(&format!("./{}/.wing", name)),
         to_string_pretty(&WingConfig {
             ..Default::default()
         })?,

@@ -48,11 +48,11 @@ impl Default for WingConfig {
 }
 
 impl WingConfig {
-    /// Generates a new WingConfig, using the wing.json configuration file.  This is a temporary solution.
+    /// Generates a new WingConfig, using the .wing configuration file.  This is a temporary solution.
     pub fn new() -> std::result::Result<WingConfig, std::io::Error> {
         let config_raw = fs::read_to_string(Path::new(&concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "./wing.json"
+            "./.wing"
         )));
 
         match config_raw {
