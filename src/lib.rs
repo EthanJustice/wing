@@ -50,10 +50,7 @@ impl Default for WingConfig {
 impl WingConfig {
     /// Generates a new WingConfig, using the .wing configuration file.  This is a temporary solution.
     pub fn new() -> std::result::Result<WingConfig, std::io::Error> {
-        let config_raw = fs::read_to_string(Path::new(&concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "./.wing"
-        )));
+        let config_raw = fs::read_to_string(Path::new(&".wing"));
 
         match config_raw {
             Ok(value) => {
@@ -151,6 +148,13 @@ impl WingTemplate {
 
         let mut options = ComrakOptions::default();
         options.render.unsafe_ = true;
+        options.extension.strikethrough = true;
+        options.extension.table = true;
+        options.extension.tasklist = true;
+        options.extension.superscript = true;
+        options.extension.header_ids = Some("".into());
+        options.extension.footnotes = true;
+        options.extension.description_lists = true;
 
         let completed = match hb.render(
             template_name,
