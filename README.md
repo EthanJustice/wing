@@ -2,8 +2,21 @@
 
 static site generator
 
++ [Roadmap](#roadmap)
 + [Install](#install)
 + [Usage](#usage)
+
+## Roadmap
+
++ Hooks (pre- & post-install)
++ Custom data (`custom-data` branch)
+  + Custom templates (`yaml!()`?)
++ File metadata (that will be available in templates)
++ Current entry metadata
++ Built-in helpers
++ Complete [rhai](https://lib.rs/crates/rhai) support
+  + `helpers` field in config
++ Syntax highlighting with [syntect](https://lib.rs/crates/syntect)
 
 ## Install
 
