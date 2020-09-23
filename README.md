@@ -17,6 +17,7 @@ static site generator
 + ~~Complete [rhai](https://lib.rs/crates/rhai) support~~
   + `helpers` field in config
 + Syntax highlighting with [syntect](https://lib.rs/crates/syntect)
++ Better error-handling
 
 ## Install
 

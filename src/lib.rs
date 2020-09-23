@@ -216,6 +216,7 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
     match message_type {
         "f" => execute!(
             stdout(),
+            SetTitle("Wing Error"),
             Print(style("ERROR      ").with(Color::Red)),
             Print(style(message)),
             Print("\n")
@@ -228,6 +229,7 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
         ),
         "i" => execute!(
             stdout(),
+            SetTitle("Wing: Indexing"),
             Print(style("INDEXING   ").with(Color::Cyan)),
             Print(style(message)),
             Print("\n")

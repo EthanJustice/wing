@@ -1,12 +1,13 @@
 //! Wing is a static site generator which does everything in its power to be *very* fast.
 // std
 use std::fs;
+use std::io::{stdout, Write};
 use std::path::Path;
 use std::time::Instant;
 
 // external
 use clap::{App, Arg, SubCommand};
-use crossterm::style::{style, Color};
+use crossterm::{execute, terminal::SetTitle};
 use walkdir::WalkDir;
 
 // local
@@ -20,6 +21,7 @@ use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 fn main() {
     let total_timing = Instant::now();
     delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
+    execute!(stdout(), SetTitle("Wing"));
 
     let wing_config = match WingConfig::new() {
         Ok(val) => val,
