@@ -14,7 +14,7 @@ static site generator
 + File metadata (that will be available in templates)
 + Current entry metadata
 + Built-in helpers
-+ Complete [rhai](https://lib.rs/crates/rhai) support
++ ~~Complete [rhai](https://lib.rs/crates/rhai) support~~
   + `helpers` field in config
 + Syntax highlighting with [syntect](https://lib.rs/crates/syntect)
 

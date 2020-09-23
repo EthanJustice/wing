@@ -5,7 +5,7 @@ use std::io::{stdout, Write};
 use std::path::Path;
 
 // external
-use comrak::{markdown_to_html, ComrakExtensionOptions, ComrakOptions};
+use comrak::{markdown_to_html, ComrakOptions};
 use crossterm::{
     execute,
     style::{style, Color, Print, StyledContent},
@@ -133,6 +133,11 @@ impl WingTemplate {
         }
 
         let mut hb = Handlebars::new();
+
+        if Path::new("./templates/helpers.rhai").is_file() == true {
+            hb.register_script_helper_file("helpers", Path::new("./templates/helpers.rhai"))
+                .unwrap();
+        };
 
         let template_path_complete = format!(
             "{}{}",
