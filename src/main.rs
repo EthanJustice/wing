@@ -80,12 +80,19 @@ fn main() {
         }
         log(
             &format!(
-                "content indexing in {}ms",
+                "content indexing ({} file{} in {}ms)",
+                index.len(),
+                match index.len() {
+                    1 => "",
+                    _ => "s",
+                },
                 index_timing.elapsed().as_millis()
             ),
             "c",
         )
         .unwrap();
+
+        let mut entry_timings = Vec::new();
 
         for entry in WalkDir::new("content").min_depth(1) {
             let entry_timing = Instant::now();
@@ -99,6 +106,8 @@ fn main() {
                     &index,
                 ) {
                     Ok(_template) => {
+                        let stamp = entry_timing.elapsed().as_millis();
+                        entry_timings.push(stamp.to_owned());
                         log(
                             &format!(
                                 "{} in {}ms",
@@ -106,7 +115,7 @@ fn main() {
                                     .unwrap()
                                     .replacen("content\\", "", 1)
                                     .replacen(".md", "", 1),
-                                entry_timing.elapsed().as_millis()
+                                stamp
                             ),
                             "b",
                         )
@@ -120,8 +129,13 @@ fn main() {
         }
         log(
             &format!(
-                "completed building in {}ms",
-                total_timing.elapsed().as_millis()
+                "completed building {} file{} in {}ms",
+                index.len(),
+                match index.len() {
+                    1 => "",
+                    _ => "s",
+                },
+                total_timing.elapsed().as_millis(),
             ),
             "s",
         )
