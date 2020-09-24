@@ -70,6 +70,8 @@ pub struct WingTemplateData {
     pub content: String,
     /// List of item paths
     pub items: Vec<String>,
+    /// current item
+    pub current: String,
 }
 
 /// Represents a template
@@ -166,6 +168,11 @@ impl WingTemplate {
             &WingTemplateData {
                 content: markdown_to_html(&content_data, &options),
                 items: index.clone(),
+                current: content
+                    .display()
+                    .to_string()
+                    .replacen("content\\", "", 1)
+                    .replacen(".md", "", 1),
             },
         ) {
             Ok(s) => s,
