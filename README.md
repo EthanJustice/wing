@@ -18,6 +18,14 @@ static site generator
   + `helpers` field in config
 + Syntax highlighting with [syntect](https://lib.rs/crates/syntect)
 + Better error-handling
++ Fix `handlebars` implementation (one declaration to rule them all...)
++ Docs
+  + `docs` command
++ Error messages
+  + Index?
++ Hot reloading/workspace watcher?
++ `help` command
++ Possible renaming (`wing_generate` is a bit verbose)
 
 ## Install
 
