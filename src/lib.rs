@@ -8,7 +8,7 @@ use std::path::Path;
 use comrak::{markdown_to_html, ComrakOptions};
 use crossterm::{
     execute,
-    style::{style, Color, Print, StyledContent},
+    style::{style, Color, Print},
     terminal::SetTitle,
     Result,
 };
@@ -88,7 +88,7 @@ pub struct WingTemplate {
 
 impl WingTemplate {
     pub fn new(
-        template: &Path,
+        hb: &Handlebars,
         content: &Path,
         config: &WingConfig,
         index: &Vec<String>,
@@ -134,25 +134,6 @@ impl WingTemplate {
             fs::create_dir_all(parent)?;
         }
 
-        let mut hb = Handlebars::new();
-
-        if Path::new("./templates/helpers.rhai").is_file() == true {
-            hb.register_script_helper_file("helpers", Path::new("./templates/helpers.rhai"))
-                .unwrap();
-        };
-
-        let template_path_complete = format!(
-            "{}{}",
-            get_working_directory().unwrap().display(),
-            template.display()
-        );
-
-        let template_path_complete_as_path = Path::new(&template_path_complete);
-        let template_name = template.file_stem().unwrap().to_str().unwrap();
-
-        hb.register_template_file(template_name, template_path_complete_as_path)
-            .expect("Failed to register template.");
-
         let mut options = ComrakOptions::default();
         options.render.unsafe_ = true;
         options.extension.strikethrough = true;
@@ -164,7 +145,7 @@ impl WingTemplate {
         options.extension.description_lists = true;
 
         let completed = match hb.render(
-            template_name,
+            "index",
             &WingTemplateData {
                 content: markdown_to_html(&content_data, &options),
                 items: index.clone(),

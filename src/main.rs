@@ -8,7 +8,8 @@ use std::time::Instant;
 // external
 use clap::{App, Arg, SubCommand};
 use crossterm::{execute, terminal::SetTitle};
-use walkdir::WalkDir;
+use handlebars::*;
+use walkdir::WalkDir; // glob import for now
 
 // local
 mod new;
@@ -21,7 +22,7 @@ use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 fn main() {
     let total_timing = Instant::now();
     delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
-    execute!(stdout(), SetTitle("Wing"));
+    execute!(stdout(), SetTitle("Wing")).unwrap();
 
     let wing_config = match WingConfig::new() {
         Ok(val) => val,
@@ -66,6 +67,17 @@ fn main() {
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
         let index_timing = Instant::now();
         log(&String::from("content..."), "i").unwrap();
+
+        let mut hb = Handlebars::new();
+
+        hb.register_template_file("index", "./templates/index.hbs")
+            .expect("Failed to register template.");
+
+        if Path::new("./templates/helpers.rhai").is_file() == true {
+            hb.register_script_helper_file("helpers", Path::new("./templates/helpers.rhai"))
+                .unwrap();
+        };
+
         let mut index = Vec::new();
         for entry in WalkDir::new("content").min_depth(1) {
             let file = entry.expect("Failed to read file.");
@@ -99,12 +111,7 @@ fn main() {
             let file = entry.expect("Failed to read file.");
             let path = file.path();
             if path.is_file() == true && path.extension().unwrap() == "md" {
-                match WingTemplate::new(
-                    Path::new(r"\templates\index.hbs"),
-                    path,
-                    &wing_config,
-                    &index,
-                ) {
+                match WingTemplate::new(&hb, path, &wing_config, &index) {
                     Ok(_template) => {
                         let stamp = entry_timing.elapsed().as_millis();
                         entry_timings.push(stamp.to_owned());
