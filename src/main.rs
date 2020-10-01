@@ -21,7 +21,6 @@ use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 
 fn main() {
     let total_timing = Instant::now();
-    delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
 
     let app = App::new("wing")
         .version(env!("CARGO_PKG_VERSION"))
@@ -31,7 +30,12 @@ fn main() {
             SubCommand::with_name("build")
                 .about("Builds your site.")
                 .version(env!("CARGO_PKG_VERSION"))
-                .author(env!("CARGO_PKG_AUTHORS")),
+                .author(env!("CARGO_PKG_AUTHORS"))
+                .arg(
+                    Arg::with_name("force")
+                        .short("f")
+                        .help("Deletes existing site, if any."),
+                ),
         )
         .subcommand(
             SubCommand::with_name("new")
@@ -49,6 +53,19 @@ fn main() {
         .get_matches();
 
     if let Some(_v) = app.subcommand_matches("build") {
+        if Path::new("./site/").is_dir() == true
+            && app.subcommand_matches("build").unwrap().is_present("force") == true
+        {
+            delete_output_dir().expect("Failed to remove previous build artifacts.");
+        } else {
+            log(
+                &String::from("Existing site found, run with -f to force."),
+                "f",
+            )
+            .unwrap();
+            return;
+        }
+
         let wing_config = match WingConfig::new() {
             Ok(val) => val,
             Err(e) => {
