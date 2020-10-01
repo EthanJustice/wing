@@ -1,7 +1,5 @@
 // std
-use std::ffi::OsStr;
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub fn get_working_directory() -> Result<PathBuf, ()> {
     Ok(std::env::current_dir().unwrap())

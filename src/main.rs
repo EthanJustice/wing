@@ -22,21 +22,6 @@ use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
 fn main() {
     let total_timing = Instant::now();
     delete_output_dir().expect("Failed to remove previous build artifacts."); // debug
-    execute!(stdout(), SetTitle("Wing")).unwrap();
-
-    let wing_config = match WingConfig::new() {
-        Ok(val) => val,
-        Err(e) => {
-            log(
-                &format!("Using defaults for Wing config.  Error: {}", e),
-                "f",
-            )
-            .unwrap();
-            WingConfig {
-                ..Default::default()
-            }
-        }
-    };
 
     let app = App::new("wing")
         .version(env!("CARGO_PKG_VERSION"))
@@ -64,6 +49,20 @@ fn main() {
         .get_matches();
 
     if let Some(_v) = app.subcommand_matches("build") {
+        let wing_config = match WingConfig::new() {
+            Ok(val) => val,
+            Err(e) => {
+                log(
+                    &format!("Using defaults for Wing config.  Error: {}", e),
+                    "f",
+                )
+                .unwrap();
+                WingConfig {
+                    ..Default::default()
+                }
+            }
+        };
+
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
         let index_timing = Instant::now();
         log(&String::from("content..."), "i").unwrap();
