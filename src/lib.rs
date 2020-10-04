@@ -18,7 +18,6 @@ use serde_json::from_str;
 
 // local
 mod utils;
-use utils::get_working_directory;
 
 /// Represents a Wing configuration file
 #[derive(Deserialize, Serialize, Debug)]
@@ -90,12 +89,12 @@ impl WingTemplate {
     pub fn new(
         hb: &Handlebars,
         content: &Path,
-        config: &WingConfig,
+        _config: &WingConfig,
         index: &Vec<String>,
     ) -> std::result::Result<WingTemplate, std::io::Error> {
         let content_file_path = format!(
             r"{}\{}",
-            get_working_directory()
+            std::env::current_dir()
                 .expect("Cannot get current working directory.")
                 .display(),
             content.display()
@@ -163,10 +162,9 @@ impl WingTemplate {
             }
         };
 
-        match fs::write(
-            completed_file_location.to_owned(),
-            completed.to_owned().as_bytes(),
-        ) {
+        let mut file = fs::File::create(completed_file_location.to_owned())?;
+
+        match write!(file, "{}", completed) {
             Ok(()) => Ok(WingTemplate {
                 content_path: String::from(parent.to_str().unwrap()),
                 content: content_data,
@@ -225,12 +223,6 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
         "g" => execute!(
             stdout(),
             Print(style("GENERATING ").with(Color::Cyan)),
-            Print(style(message)),
-            Print("\n")
-        ),
-        "b" => execute!(
-            stdout(),
-            Print(style("BUILT      ").with(Color::Yellow)),
             Print(style(message)),
             Print("\n")
         ),
