@@ -1,7 +1,7 @@
 //! Wing core
 // std
 use std::fs;
-use std::io::{stdout, Write};
+use std::io::{stdout, BufWriter, Write};
 use std::path::Path;
 
 // external
@@ -91,7 +91,7 @@ impl WingTemplate {
         content: &Path,
         _config: &WingConfig,
         index: &Vec<String>,
-    ) -> std::result::Result<WingTemplate, std::io::Error> {
+    ) -> std::result::Result<(), std::io::Error> {
         let content_file_path = format!(
             r"{}\{}",
             std::env::current_dir()
@@ -162,16 +162,18 @@ impl WingTemplate {
             }
         };
 
-        let mut file = fs::File::create(completed_file_location.to_owned())?;
+        let completed_bytes = completed.as_bytes();
 
-        match write!(file, "{}", completed) {
-            Ok(()) => Ok(WingTemplate {
-                content_path: String::from(parent.to_str().unwrap()),
-                content: content_data,
+        let file = fs::File::create(completed_file_location.to_owned())?;
 
-                completed: completed,
-                completed_file: String::from(completed_file_location.to_str().unwrap()),
-            }),
+        let mut stream = BufWriter::new(file);
+
+        for i in 0..completed.len() {
+            stream.write(&[completed_bytes[i]]).unwrap();
+        }
+
+        match stream.flush() {
+            Ok(()) => Ok(()),
 
             Err(e) => {
                 log(
