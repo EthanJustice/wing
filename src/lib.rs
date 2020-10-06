@@ -5,7 +5,6 @@ use std::io::{stdout, BufWriter, Write};
 use std::path::Path;
 
 // external
-use comrak::{markdown_to_html, ComrakOptions};
 use crossterm::{
     execute,
     style::{style, Color, Print},
@@ -13,6 +12,7 @@ use crossterm::{
     Result,
 };
 use handlebars::*; // glob import for now
+use pulldown_cmark::{html, Options, Parser};
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
 
@@ -133,20 +133,16 @@ impl WingTemplate {
             fs::create_dir_all(parent)?;
         }
 
-        let mut options = ComrakOptions::default();
-        options.render.unsafe_ = true;
-        options.extension.strikethrough = true;
-        options.extension.table = true;
-        options.extension.tasklist = true;
-        options.extension.superscript = true;
-        options.extension.header_ids = Some("".into());
-        options.extension.footnotes = true;
-        options.extension.description_lists = true;
+        let mut options = Options::empty();
+        options.insert(Options::all());
+        let parser = Parser::new_ext(content_data.as_str(), options);
+        let mut html_output = String::new();
+        html::push_html(&mut html_output, parser);
 
         let completed = match hb.render(
             "index",
             &WingTemplateData {
-                content: markdown_to_html(&content_data, &options),
+                content: html_output,
                 items: index.clone(),
                 current: content
                     .display()

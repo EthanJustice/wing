@@ -20,7 +20,7 @@ serde_json = "~1.0.57"
 
 # markdown + templating
 handlebars = { version = "= 3.3.0", features = ["script_helper"] }
-comrak = "~0.8.2"
+pulldown-cmark = "~0.8.0"
 
 # fs
 walkdir = "~2.3.1"
