@@ -11,10 +11,10 @@ use crossterm::{
     terminal::SetTitle,
     Result,
 };
-use handlebars::*; // glob import for now
 use pulldown_cmark::{html, Options, Parser};
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
+use tera::{Context, Tera};
 
 // local
 mod utils;
@@ -87,7 +87,7 @@ pub struct WingTemplate {
 
 impl WingTemplate {
     pub fn new(
-        hb: &Handlebars,
+        tera: &Tera,
         content: &Path,
         _config: &WingConfig,
         index: &Vec<String>,
@@ -139,17 +139,19 @@ impl WingTemplate {
         let mut html_output = String::new();
         html::push_html(&mut html_output, parser);
 
-        let completed = match hb.render(
-            "index",
-            &WingTemplateData {
-                content: html_output,
-                items: index.clone(),
-                current: content
-                    .display()
-                    .to_string()
-                    .replacen("content\\", "", 1)
-                    .replacen(".md", "", 1),
-            },
+        let ctx = &WingTemplateData {
+            content: html_output,
+            items: index.clone(),
+            current: content
+                .display()
+                .to_string()
+                .replacen("content\\", "", 1)
+                .replacen(".md", "", 1),
+        };
+
+        let completed = match tera.render(
+            "index.html",
+            &Context::from_serialize(ctx).expect("Failed to write template"),
         ) {
             Ok(s) => s,
             Err(e) => {
