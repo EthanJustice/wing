@@ -6,8 +6,9 @@ use std::time::Instant;
 
 // external
 use clap::{App, Arg, SubCommand};
-use handlebars::*; // glob import for now
+use lazy_static::lazy_static;
 use rayon::prelude::*;
+use tera::*; // glob import for now
 use walkdir::WalkDir;
 
 // local
@@ -81,14 +82,18 @@ fn main() {
 
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
 
-        let mut hb = Handlebars::new();
-
-        hb.register_template_file("index", "./templates/index.hbs")
-            .expect("Failed to register template.");
-
-        if Path::new("./templates/helpers.rhai").is_file() == true {
-            hb.register_script_helper_file("helpers", Path::new("./templates/helpers.rhai"))
-                .unwrap();
+        lazy_static! {
+            pub static ref TERA_TEMPLATES: Tera = {
+                let mut tera = match Tera::new("templates/**/*") {
+                    Ok(t) => t,
+                    Err(error) => {
+                        log(&format!("Failed to parse template(s): {}", error), "f").unwrap();
+                        std::process::exit(1);
+                    }
+                };
+                tera.autoescape_on(vec!["html"]);
+                tera
+            };
         };
 
         let mut file_index = Vec::new();
@@ -110,7 +115,7 @@ fn main() {
         index.into_inner().into_par_iter().for_each(|entry| {
             let path = entry.unwrap().into_path();
             if path.is_file() == true && path.extension().unwrap() == "md" {
-                match WingTemplate::new(&hb, &path, &wing_config, &file_index) {
+                match WingTemplate::new(&TERA_TEMPLATES, &path, &wing_config, &file_index) {
                     Ok(_template) => {}
                     Err(e) => {
                         log(&String::from(e.to_string()), "f").unwrap();
