@@ -156,6 +156,25 @@ fn main() {
             "s",
         )
         .unwrap();
+
+        for script in wing_config.post_scripts.iter() {
+            let args: Vec<&str> = script.split("--").collect();
+            match Command::new(script)
+                .args(args)
+                .stdout(Stdio::piped())
+                .output()
+            {
+                Ok(_v) => continue,
+                Err(e) => {
+                    log(
+                        &format!("Post-run script failed with error: \"{}\"", e.to_string()),
+                        "f",
+                    )
+                    .unwrap();
+                    std::process::exit(1)
+                }
+            };
+        }
     } else if let Some(v) = app.subcommand_matches("new") {
         log(&String::from("new project"), "g").unwrap();
         match generate_new(v.value_of("name").unwrap()) {
