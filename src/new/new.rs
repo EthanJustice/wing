@@ -30,7 +30,7 @@ fn generate_template_dir(name: &str) -> Result<(), std::io::Error> {
 
 /// Creates a new index.hbs file in the template directory
 fn generate_template_index(name: &str) -> Result<(), std::io::Error> {
-    fs::write(Path::new(&format!("./{}/templates/index.hbs", name)), "")
+    fs::write(Path::new(&format!("./{}/templates/index.html", name)), "")
 }
 
 fn generate_default_config(name: &str) -> Result<(), std::io::Error> {

@@ -9,28 +9,25 @@ static site generator
 ## Roadmap
 
 + `title` and `titleIndex` metadata
-+ Hooks (pre- & post-install)
-+ Custom data (`custom-data` branch)
-  + Custom templates (`yaml!()`?)
 + File metadata (that will be available in templates)
 + Current entry metadata
 + Built-in helpers
-+ ~~Complete [rhai](https://lib.rs/crates/rhai) support~~
-  + `helpers` field in config
 + Syntax highlighting with [syntect](https://lib.rs/crates/syntect)
 + Better error-handling
 + Docs
   + `docs` command
 + Error messages
   + Crates
-  + Index?
 + Hot reloading/workspace watcher?
 + `help` command
 + Possible renaming (`wing_generate` is a bit verbose)
 + Use a percentage instead of a line for each document
 + Benchmarks
++ Tests
 + Remote fetching at compile time (external assets, API data)
 + wing-utils?
++ ~~Hooks (pre- & post-install)~~
++ ~~Custom data~~
 
 ## Install
 
