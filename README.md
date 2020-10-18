@@ -8,6 +8,7 @@ static site generator
 
 ## Roadmap
 
++ `title` and `titleIndex` metadata
 + Hooks (pre- & post-install)
 + Custom data (`custom-data` branch)
   + Custom templates (`yaml!()`?)
@@ -27,6 +28,9 @@ static site generator
 + `help` command
 + Possible renaming (`wing_generate` is a bit verbose)
 + Use a percentage instead of a line for each document
++ Benchmarks
++ Remote fetching at compile time (external assets, API data)
++ wing-utils?
 
 ## Install
 

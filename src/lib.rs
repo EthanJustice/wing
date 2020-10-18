@@ -71,6 +71,14 @@ pub struct WingTemplateData {
     pub items: Vec<String>,
     /// current item
     pub current: String,
+    /// frontmatter
+    pub frontmatter: WingTemplateFrontmatter,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct WingTemplateFrontmatter {
+    /// template to use
+    pub template: String,
 }
 
 /// Represents a template
@@ -133,9 +141,29 @@ impl WingTemplate {
             fs::create_dir_all(parent)?;
         }
 
+        let mut frontmatter = WingTemplateFrontmatter {
+            template: String::new(),
+        };
+
         let mut options = Options::empty();
         options.insert(Options::all());
-        let parser = Parser::new_ext(content_data.as_str(), options);
+        let parser = Parser::new_ext(content_data.as_str(), options).map(|event| {
+            if let pulldown_cmark::Event::Text(text) = event.clone() {
+                if text.starts_with("template") {
+                    let raw_frontmatter: WingTemplateFrontmatter =
+                        serde_yaml::from_str(text.to_string().as_str())
+                            .expect("Couldn't read file frontmatter.");
+                    frontmatter.template = raw_frontmatter.template;
+
+                    pulldown_cmark::Event::Text(pulldown_cmark::CowStr::Borrowed(""))
+                } else {
+                    event
+                }
+            } else {
+                event
+            }
+        });
+
         let mut html_output = String::new();
         html::push_html(&mut html_output, parser);
 
@@ -147,10 +175,17 @@ impl WingTemplate {
                 .to_string()
                 .replacen("content\\", "", 1)
                 .replacen(".md", "", 1),
+            frontmatter: frontmatter.clone(),
+        };
+
+        let template = if frontmatter.template.len() == 0 {
+            String::from("index")
+        } else {
+            frontmatter.template
         };
 
         let completed = match tera.render(
-            "index.html",
+            format!("{}.html", template).as_str(),
             &Context::from_serialize(ctx).expect("Failed to write template"),
         ) {
             Ok(s) => s,

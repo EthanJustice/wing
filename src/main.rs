@@ -91,7 +91,7 @@ fn main() {
                         std::process::exit(1);
                     }
                 };
-                tera.autoescape_on(vec!["html"]);
+                tera.autoescape_on(vec![]);
                 tera
             };
         };
