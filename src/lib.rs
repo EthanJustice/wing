@@ -11,7 +11,7 @@ use crossterm::{
     terminal::SetTitle,
     Result,
 };
-use pulldown_cmark::{html, Options, Parser};
+use pulldown_cmark::{html, CowStr, Event, Options, Parser};
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
 use tera::{Context, Tera};
@@ -33,6 +33,10 @@ pub struct WingConfig {
     /// Values: `none`, `low`, `high`
     /// Determines the level of optimisation to run the new site through
     pub optimisation_level: String,
+    ///
+    pub pre_scripts: Vec<String>,
+    ///
+    pub post_scripts: Vec<String>,
 }
 
 impl Default for WingConfig {
@@ -42,6 +46,8 @@ impl Default for WingConfig {
             site_map: false,
             link_type: String::from("relative"),
             optimisation_level: String::from("none"),
+            pre_scripts: vec![],
+            post_scripts: vec![],
         }
     }
 }
@@ -148,14 +154,14 @@ impl WingTemplate {
         let mut options = Options::empty();
         options.insert(Options::all());
         let parser = Parser::new_ext(content_data.as_str(), options).map(|event| {
-            if let pulldown_cmark::Event::Text(text) = event.clone() {
+            if let Event::Text(text) = event.clone() {
                 if text.starts_with("template") {
                     let raw_frontmatter: WingTemplateFrontmatter =
                         serde_yaml::from_str(text.to_string().as_str())
                             .expect("Couldn't read file frontmatter.");
                     frontmatter.template = raw_frontmatter.template;
 
-                    pulldown_cmark::Event::Text(pulldown_cmark::CowStr::Borrowed(""))
+                    Event::Text(CowStr::Borrowed(""))
                 } else {
                     event
                 }

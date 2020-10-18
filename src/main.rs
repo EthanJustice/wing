@@ -2,6 +2,7 @@
 // std
 use std::fs;
 use std::path::Path;
+use std::process::{Command, Stdio};
 use std::time::Instant;
 
 // external
@@ -54,10 +55,8 @@ fn main() {
 
     if let Some(_v) = app.subcommand_matches("build") {
         if Path::new("./site/").is_dir() == true
-            && app.subcommand_matches("build").unwrap().is_present("force") == true
+            && app.subcommand_matches("build").unwrap().is_present("force") == false
         {
-            delete_output_dir().expect("Failed to remove previous build artifacts.");
-        } else {
             log(
                 &String::from("Existing site found, run with -f to force."),
                 "f",
@@ -79,6 +78,31 @@ fn main() {
                 }
             }
         };
+
+        for script in wing_config.pre_scripts.iter() {
+            let args: Vec<&str> = script.split("--").collect();
+            match Command::new(script)
+                .args(args)
+                .stdout(Stdio::piped())
+                .output()
+            {
+                Ok(_v) => continue,
+                Err(e) => {
+                    log(
+                        &format!("Pre-run script failed with error: \"{}\"", e.to_string()),
+                        "f",
+                    )
+                    .unwrap();
+                    std::process::exit(1)
+                }
+            };
+        }
+
+        if Path::new("./site/").is_dir() == true
+            && app.subcommand_matches("build").unwrap().is_present("force") == true
+        {
+            delete_output_dir().expect("Failed to remove previous build artifacts.");
+        }
 
         fs::create_dir(Path::new(&format!("./site/"))).unwrap();
 

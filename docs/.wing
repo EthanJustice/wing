@@ -2,5 +2,7 @@
     "rss": false,
     "siteMap": false,
     "linkType": "relative",
-    "optimisationLevel": "none"
+    "optimisationLevel": "none",
+    "preScripts": [],
+    "postScripts": []
 }
