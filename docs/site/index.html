@@ -1,6 +1,63 @@
-<div>
-    index
-    <h1>Wing</h1>
-    <p>Testing</p>
+<!DOCTYPE html>
+<html lang="en">
 
-</div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>wing :: index</title>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/gyr-css@1.6.5/dist/light.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/gyr-css@1.6.5/dist/dark.min.css"
+            media="(prefers-color-scheme:dark)" />
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/solarized-light.min.css">
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/solarized-dark.min.css"
+            media="(prefers-color-scheme:dark)">
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js"></script>
+    </head>
+
+    <body>
+        <script>
+            hljs.initHighlightingOnLoad();
+            window.addEventListener('caracal:page-change', (e) => {
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
+                });
+            })
+        </script>
+        <h1>Wing</h1>
+<ul>
+<li><a href="https://github.com/EthanJustice/wing">Source</a></li>
+<li><a href="https://ethanjustice.github.io/wing">Docs</a></li>
+</ul>
+<p>Wing is a fairly simple static site generator, focusing on end performace.</p>
+<h2>Config</h2>
+<p>Wing can be configured by placing a <code>.wing</code> file in your site’s root directory.  It’s written in JSON.</p>
+<p>Wing’s default configuration file looks like this:</p>
+<pre><code class="language-json">{
+    &quot;rss&quot;: false,
+    &quot;siteMap&quot;: false,
+    &quot;linkType&quot;: &quot;relative&quot;,
+    &quot;optimisationLevel&quot;: &quot;none&quot;,
+    &quot;preScripts&quot;: [],
+    &quot;postScripts&quot;: []
+}
+</code></pre>
+<h2>Templates</h2>
+<p>Wing uses <a href="https://tera.netlify.app/">tera</a> for templating.</p>
+<h2>Built-ins</h2>
+<p>Wing comes with several built-in items.</p>
+<ul>
+<li><code>content</code> - HTML generated from the MarkDown file</li>
+<li><code>items</code> - a list of all items (as paths)</li>
+<li><code>current</code> - the current item (as a path)</li>
+<li><code>frontmatter</code> - frontmatter from the template
+<ul>
+<li><code>template</code> - template name</li>
+</ul>
+</li>
+</ul>
+
+    </body>
+
+</html>

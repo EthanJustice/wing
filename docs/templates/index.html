@@ -1,4 +1,31 @@
-<div>
-    {{ current }}
-    {{ content }}
-</div>
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>wing :: {{ current }}</title>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/gyr-css@1.6.5/dist/light.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/gyr-css@1.6.5/dist/dark.min.css"
+            media="(prefers-color-scheme:dark)" />
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/solarized-light.min.css">
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/solarized-dark.min.css"
+            media="(prefers-color-scheme:dark)">
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js"></script>
+    </head>
+
+    <body>
+        <script>
+            hljs.initHighlightingOnLoad();
+            window.addEventListener('caracal:page-change', (e) => {
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
+                });
+            })
+        </script>
+        {{ content }}
+    </body>
+
+</html>
