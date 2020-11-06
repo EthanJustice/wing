@@ -1,33 +1,13 @@
 # wing
 
-static site generator
+(ec)static site generator
 
-+ [Roadmap](#roadmap)
+[Documentation](./docs/content)
+
+**Note**: `wing` was primarily built for learning purposes. It works as a static site generator, but there are more feature-rich SSGs available.
+
 + [Install](#install)
 + [Usage](#usage)
-
-## Roadmap
-
-+ `title` and `titleIndex` metadata
-+ File metadata (that will be available in templates)
-+ Current entry metadata
-+ Built-in helpers
-+ Syntax highlighting with [syntect](https://lib.rs/crates/syntect)
-+ Better error-handling
-+ Docs
-  + `docs` command
-+ Error messages
-  + Crates
-+ Hot reloading/workspace watcher?
-+ `help` command
-+ Possible renaming (`wing_generate` is a bit verbose)
-+ Use a percentage instead of a line for each document
-+ Benchmarks
-+ Tests
-+ Remote fetching at compile time (external assets, API data)
-+ wing-utils?
-+ ~~Hooks (pre- & post-install)~~
-+ ~~Custom data~~
 
 ## Install
 
@@ -52,11 +32,3 @@ SUBCOMMANDS:
     help     Prints this message or the help of the given subcommand(s)
     new      Create a new wing project.
 ```
-
-For now, `wing` doesn't support custom templates.  You can only use `index.hbs` for generation.
-
-### Custom Metadata
-
-For now, `wing` doesn't support custom metadata, although it provides a small amount that can be used in templates.  `custom` contains the MarkDown of the current file in HTML; `items` contains the index of files.
-
-### Wing Config
