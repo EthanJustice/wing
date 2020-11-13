@@ -155,13 +155,13 @@ impl WingTemplate {
         options.insert(Options::all());
         let parser = Parser::new_ext(content_data.as_str(), options).map(|event| {
             if let Event::Text(text) = event.clone() {
-                if text.starts_with("template") {
+                if text.starts_with("template: ") && frontmatter.template.len() == 0 {
                     let raw_frontmatter: WingTemplateFrontmatter =
                         serde_yaml::from_str(text.to_string().as_str())
                             .expect("Couldn't read file frontmatter.");
                     frontmatter.template = raw_frontmatter.template;
 
-                    Event::Text(CowStr::Borrowed(""))
+                    Event::Html(CowStr::Borrowed(""))
                 } else {
                     event
                 }
