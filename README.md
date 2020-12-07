@@ -9,6 +9,10 @@
 + [Install](#install)
 + [Usage](#usage)
 
+Todo:
+
++ server for quick rebuilding
+
 ## Install
 
 For now, as Wing is not on [`crates.io`](https://crates.io/) and CI hasn't been set up, installation has to be done through Cargo.

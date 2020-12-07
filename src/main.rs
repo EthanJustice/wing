@@ -16,9 +16,7 @@ use walkdir::WalkDir;
 mod new;
 use new::new::generate_new;
 
-mod utils;
-
-use wing_generate::{delete_output_dir, log, WingConfig, WingTemplate};
+use wing_generate::{log, WingConfig, WingTemplate};
 
 fn main() {
     let total_timing = Instant::now();
@@ -98,13 +96,23 @@ fn main() {
             };
         }
 
-        if Path::new("./site/").is_dir() == true
-            && app.subcommand_matches("build").unwrap().is_present("force") == true
-        {
-            delete_output_dir().expect("Failed to remove previous build artifacts.");
+        let mut previous_build_exists: bool = false;
+        if Path::new("./site/").is_dir() == true {
+            if app.subcommand_matches("build").unwrap().is_present("force") == false {
+                log(
+                    &String::from("Previous builds already exist, run with -f to overwrite."),
+                    "f",
+                )
+                .unwrap();
+                std::process::exit(1);
+            }
+
+            previous_build_exists = true;
         }
 
-        fs::create_dir(Path::new(&format!("./site/"))).unwrap();
+        if Path::new("./site/").is_dir() == false {
+            fs::create_dir(Path::new(&format!("./site/"))).unwrap();
+        }
 
         lazy_static! {
             pub static ref TERA_TEMPLATES: Tera = {
@@ -156,6 +164,21 @@ fn main() {
             "s",
         )
         .unwrap();
+
+        if previous_build_exists == true {
+            for entry in WalkDir::new("site").min_depth(1) {
+                let file = entry.expect("Failed to read file.");
+                let path = file.path();
+                if path.is_file() == true && path.extension().unwrap() == "html" {
+                    let path_normalised = String::from(file.path().to_str().unwrap())
+                        .replace("site\\", "")
+                        .replace(".html", "");
+                    if file_index.contains(&path_normalised) == false {
+                        fs::remove_file(&path).unwrap();
+                    }
+                }
+            }
+        }
 
         for script in wing_config.post_scripts.iter() {
             let args: Vec<&str> = script.split("--").collect();

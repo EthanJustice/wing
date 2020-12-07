@@ -17,7 +17,6 @@ use serde_json::from_str;
 use tera::{Context, Tera};
 
 // local
-mod utils;
 
 /// Represents a Wing configuration file
 #[derive(Deserialize, Serialize, Debug)]
@@ -228,15 +227,6 @@ impl WingTemplate {
             }
         }
     }
-}
-
-/// Removes the previous site
-pub fn delete_output_dir() -> std::io::Result<()> {
-    if Path::new("./site/").is_dir() == true {
-        fs::remove_dir_all(Path::new("./site/"))?;
-    }
-
-    Ok(())
 }
 
 pub fn log(message: &String, message_type: &str) -> Result<()> {
