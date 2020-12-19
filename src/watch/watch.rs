@@ -2,6 +2,7 @@
 
 // crates
 use hotwatch::{Event, Hotwatch};
+use open::that;
 use rocket::{Catcher, Rocket, Route};
 use rocket_contrib::serve::StaticFiles;
 
@@ -16,6 +17,7 @@ pub fn init_watch() {
         }
     })
     .expect("Failed to watch directory.");
+    open::that("http://localhost:8000").expect("Failed to open in browser.");
     rocket::ignite()
         .mount("/", StaticFiles::from("site/"))
         .launch();
