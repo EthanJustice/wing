@@ -3,6 +3,7 @@
 use std::fs;
 use std::io::{stdout, BufWriter, Write};
 use std::path::Path;
+use std::process::{Command, Stdio};
 
 // external
 use crossterm::{
@@ -11,10 +12,13 @@ use crossterm::{
     terminal::SetTitle,
     Result,
 };
+use lazy_static::lazy_static;
 use pulldown_cmark::{html, CowStr, Event, Options, Parser};
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
 use tera::{Context, Tera};
+use walkdir::WalkDir;
 
 // local
 
@@ -32,9 +36,9 @@ pub struct WingConfig {
     /// Values: `none`, `low`, `high`
     /// Determines the level of optimisation to run the new site through
     pub optimisation_level: String,
-    ///
+    /// Scripts to run before building. This can also run other build tools.
     pub pre_scripts: Vec<String>,
-    ///
+    /// Scripts to run after building. This can also run other build tools.
     pub post_scripts: Vec<String>,
 }
 
@@ -226,6 +230,167 @@ impl WingTemplate {
                 std::process::exit(1);
             }
         }
+    }
+}
+
+// build a site
+pub fn build(app: Option<&clap::ArgMatches>, total_timing: Option<std::time::Instant>) {
+    if Path::new("./site/").is_dir() == true && app.is_some() == true {
+        if app
+            .unwrap()
+            .subcommand_matches("build")
+            .unwrap()
+            .is_present("force")
+            == false
+        {
+            log(
+                &String::from("Existing site found, run with -f to force."),
+                "f",
+            )
+            .unwrap();
+            return;
+        }
+    }
+
+    let wing_config = match WingConfig::new() {
+        Ok(val) => val,
+        Err(e) => {
+            log(
+                &format!("Using defaults for Wing config.  Error: {}", e),
+                "f",
+            )
+            .unwrap();
+            WingConfig {
+                ..Default::default()
+            }
+        }
+    };
+
+    for script in wing_config.pre_scripts.iter() {
+        let args: Vec<&str> = script.split("--").collect();
+        match Command::new(script)
+            .args(args)
+            .stdout(Stdio::piped())
+            .output()
+        {
+            Ok(_v) => continue,
+            Err(e) => {
+                log(
+                    &format!("Pre-run script failed with error: \"{}\"", e.to_string()),
+                    "f",
+                )
+                .unwrap();
+                std::process::exit(1)
+            }
+        };
+    }
+
+    let mut previous_build_exists: bool = false;
+    if Path::new("./site/").is_dir() == true && app.is_some() == true {
+        if app
+            .unwrap()
+            .subcommand_matches("build")
+            .unwrap()
+            .is_present("force")
+            == false
+        {
+            log(
+                &String::from("Previous builds already exist, run with -f to overwrite."),
+                "f",
+            )
+            .unwrap();
+            std::process::exit(1);
+        }
+
+        previous_build_exists = true;
+    }
+
+    if Path::new("./site/").is_dir() == false {
+        fs::create_dir(Path::new(&format!("./site/"))).unwrap();
+    }
+
+    lazy_static! {
+        pub static ref TERA_TEMPLATES: Tera = {
+            let mut tera = match Tera::new("templates/**/*") {
+                Ok(t) => t,
+                Err(error) => {
+                    log(&format!("Failed to parse template(s): {}", error), "f").unwrap();
+                    std::process::exit(1);
+                }
+            };
+            tera.autoescape_on(vec![]);
+            tera
+        };
+    };
+
+    let mut file_index = Vec::new();
+    for entry in WalkDir::new("content").min_depth(1) {
+        let file = entry.expect("Failed to read file.");
+        let path = file.path();
+        if path.is_file() == true && path.extension().unwrap() == "md" {
+            file_index.push(
+                String::from(file.path().to_str().unwrap())
+                    .replace("content\\", "")
+                    .replace(".md", ""),
+            );
+        }
+    }
+
+    let index: std::cell::RefCell<Vec<_>> =
+        std::cell::RefCell::new(WalkDir::new("content").min_depth(1).into_iter().collect());
+
+    index.into_inner().into_par_iter().for_each(|entry| {
+        let path = entry.unwrap().into_path();
+        if path.is_file() == true && path.extension().unwrap() == "md" {
+            match WingTemplate::new(&TERA_TEMPLATES, &path, &wing_config, &file_index) {
+                Ok(_template) => {}
+                Err(e) => {
+                    log(&String::from(e.to_string()), "f").unwrap();
+                }
+            };
+        }
+    });
+
+    if let Some(timing) = total_timing {
+        log(
+            &format!("completed building in {}ms", timing.elapsed().as_millis(),),
+            "s",
+        )
+        .unwrap();
+    }
+
+    if previous_build_exists == true {
+        for entry in WalkDir::new("site").min_depth(1) {
+            let file = entry.expect("Failed to read file.");
+            let path = file.path();
+            if path.is_file() == true && path.extension().unwrap() == "html" {
+                let path_normalised = String::from(file.path().to_str().unwrap())
+                    .replace("site\\", "")
+                    .replace(".html", "");
+                if file_index.contains(&path_normalised) == false {
+                    fs::remove_file(&path).unwrap();
+                }
+            }
+        }
+    }
+
+    for script in wing_config.post_scripts.iter() {
+        let args: Vec<&str> = script.split("--").collect();
+        match Command::new(script)
+            .args(args)
+            .stdout(Stdio::piped())
+            .output()
+        {
+            Ok(_v) => continue,
+            Err(e) => {
+                log(
+                    &format!("Post-run script failed with error: \"{}\"", e.to_string()),
+                    "f",
+                )
+                .unwrap();
+                std::process::exit(1)
+            }
+        };
     }
 }
 

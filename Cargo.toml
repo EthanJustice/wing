@@ -25,10 +25,17 @@ pulldown-cmark = "~0.8.0"
 
 # fs
 walkdir = "~2.3.1"
+hotwatch = "~0.4.5"
 
 # concurrency
 rayon = "~1.4.1"
 
+# watch
+rocket = "~0.4.6"
+rocket_contrib = "~0.4.6"
+
+# other
+open = "~1.4.0"
 lazy_static = "~1.4.0"
 
 [profile.release]
