@@ -2,7 +2,9 @@
 
 (ec)static site generator
 
-[Documentation](./docs/content)
+[Documentation](./docs/content/index.md)
+
+**Note**: `wing` is very early in development. It has few tests, and no CI to test cross-platform. This will be improved in the future.
 
 **Note**: `wing` was primarily built for learning purposes. It works as a static site generator, but there are more feature-rich SSGs available.
 
@@ -21,9 +23,12 @@ For now, as Wing is not on [`crates.io`](https://crates.io/) and CI hasn't been 
 
 Since `wing` and `wng` are already taken on `crates.io`, the package's name is `wsg`, for **w**ing **s**ite **g**enerator.
 
-`cargo install --git https://github.com/EthanJustice/wing.git`
++ latest commit in the Git repository: `cargo install --git https://github.com/EthanJustice/wing.git`
++ latest published version on `crates.io`: `cargo install wsg`
 
 ## Usage
+
+`wsg --help`
 
 ### CLI
 
@@ -49,5 +54,5 @@ To prepare for development:
 
 1. `git clone https://github.com/EthanJustice/wing.git`
 2. Make sure you're using the nightly Rust compiler
-  + Check with `rustup show`
-  + Change with `rustup default nightly`
+  Check with `rustup show`
+  Change with `rustup default nightly`

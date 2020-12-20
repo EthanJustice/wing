@@ -1,13 +1,16 @@
 [package]
 name = "wsg"
+description = "(ec)static site generator"
 version = "0.0.2"
 authors = ["EthanJustice <47954690+EthanJustice@users.noreply.github.com>"]
 edition = "2018"
 readme = "README.md"
 homepage = "https://github.com/EthanJustice/wing"
 repository = "https://github.com/EthanJustice/wing"
+documentation = "https://docs.rs/wsg/"
 license = "MIT"
-publish = false
+keywords = ["ssg"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 # cli
@@ -35,9 +38,9 @@ rocket = "~0.4.6"
 rocket_contrib = "~0.4.6"
 
 # other
-open = "~1.4.0"
-lazy_static = "~1.4.0"
-chrono = "~0.4.19"
+open = "~1.4.0" # serve
+lazy_static = "~1.4.0" # templating
+chrono = "~0.4.19" # templating data
 
 [profile.release]
 opt-level = 3
