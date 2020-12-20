@@ -27,7 +27,13 @@ fn main() {
             SubCommand::with_name("watch")
                 .about("Rebuild your site on file changes, and serve it.")
                 .version(env!("CARGO_PKG_VERSION"))
-                .author(env!("CARGO_PKG_AUTHORS")),
+                .author(env!("CARGO_PKG_AUTHORS"))
+                .arg(
+                    Arg::with_name("silent")
+                        .long("silent")
+                        .short("s")
+                        .help("Prevents site being opened in the browser automatically."),
+                ),
         )
         .subcommand(
             SubCommand::with_name("build")
@@ -72,7 +78,7 @@ fn main() {
                 std::process::exit(1);
             }
         };
-    } else if let Some(_v) = app.subcommand_matches("watch") {
-        init_watch();
+    } else if let Some(v) = app.subcommand_matches("watch") {
+        init_watch(v.is_present("silent"));
     }
 }

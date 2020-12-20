@@ -398,33 +398,33 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
     match message_type {
         "f" => execute!(
             stdout(),
-            SetTitle("Wing Error"),
+            SetTitle("Error"),
             Print(style("ERROR      ").with(Color::Red)),
             Print(style(message)),
             Print("\n")
         ),
         "s" => execute!(
             stdout(),
-            Print(style("SUCESS     ").with(Color::Green)),
+            Print(style("Success").with(Color::Green)),
             Print(style(message)),
             Print("\n")
         ),
         "i" => execute!(
             stdout(),
-            SetTitle("Wing: Indexing"),
-            Print(style("INDEXING   ").with(Color::Cyan)),
+            SetTitle("Indexing"),
+            Print(style("INDEXING").with(Color::Cyan)),
             Print(style(message)),
             Print("\n")
         ),
         "g" => execute!(
             stdout(),
-            Print(style("GENERATING ").with(Color::Cyan)),
+            Print(style("Generating ").with(Color::Cyan)),
             Print(style(message)),
             Print("\n")
         ),
         "c" => execute!(
             stdout(),
-            Print(style("COMPLETED  ").with(Color::Green)),
+            Print(style("Completed").with(Color::Green)),
             Print(style(message)),
             Print("\n")
         ),
