@@ -11,8 +11,8 @@ use clap::{App, Arg, SubCommand};
 mod new;
 use new::new::generate_new;
 
-mod watch;
-use watch::watch::init_watch;
+mod serve;
+use serve::serve::init;
 
 use wsg::{build, log};
 
@@ -24,7 +24,7 @@ fn main() {
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .subcommand(
-            SubCommand::with_name("watch")
+            SubCommand::with_name("serve")
                 .about("Rebuild your site on file changes, and serve it.")
                 .version(env!("CARGO_PKG_VERSION"))
                 .author(env!("CARGO_PKG_AUTHORS"))
@@ -86,11 +86,11 @@ fn main() {
                 std::process::exit(1);
             }
         };
-    } else if let Some(v) = app.subcommand_matches("watch") {
+    } else if let Some(v) = app.subcommand_matches("serve") {
         let port: u16 = match v.value_of("port") {
             Some(val) => val.parse().unwrap_or(8000),
             None => 8000,
         };
-        init_watch(v.is_present("silent"), port);
+        init(v.is_present("silent"), port);
     }
 }

@@ -30,7 +30,7 @@ hotwatch = "~0.4.5"
 # concurrency
 rayon = "~1.4.1"
 
-# watch
+# serve
 rocket = "~0.4.6"
 rocket_contrib = "~0.4.6"
 

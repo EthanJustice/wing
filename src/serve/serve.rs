@@ -27,7 +27,7 @@ fn not_found() -> Content<&'static str> {
 }
 
 /// If `open` is set to true, the site will **not** be opened automatically.
-pub fn init_watch(open: bool, port: u16) {
+pub fn init(open: bool, port: u16) {
     if Path::new("site/").is_dir() == false {
         log(
             &String::from("Failed to start watching as site directory doesn't exist."),

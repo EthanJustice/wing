@@ -14,7 +14,6 @@ use crossterm::{
     terminal::SetTitle,
     Result,
 };
-use fs::Metadata;
 use lazy_static::lazy_static;
 use pulldown_cmark::{html, CowStr, Event, Options, Parser};
 use rayon::prelude::*;
