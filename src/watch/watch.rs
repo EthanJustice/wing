@@ -11,7 +11,7 @@ use wing_generate::build;
 
 pub fn init_watch() {
     let mut hw = Hotwatch::new().expect("Failed to initialise file watcher");
-    hw.watch("content/", |e: Event| {
+    hw.watch("./", |e: Event| {
         if let Event::Write(_path) = e {
             build(None, None);
         }
@@ -19,6 +19,8 @@ pub fn init_watch() {
     .expect("Failed to watch directory.");
     open::that("http://localhost:8000").expect("Failed to open in browser.");
     rocket::ignite()
+        .mount("/static/", StaticFiles::from("static/").rank(-1))
         .mount("/", StaticFiles::from("site/"))
         .launch();
+    //    todo!("Add 404 template, maybe use Maud");
 }
