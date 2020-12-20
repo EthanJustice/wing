@@ -11,11 +11,15 @@
 
 Todo:
 
-+ server for quick rebuilding
++ tests
++ docs
++ refactor
 
 ## Install
 
 For now, as Wing is not on [`crates.io`](https://crates.io/) and CI hasn't been set up, installation has to be done through Cargo.
+
+Since `wing` and `wng` are already taken on `crates.io`, the package's name is `wsg`, for **w**ing **s**ite **g**enerator.
 
 `cargo install --git https://github.com/EthanJustice/wing.git`
 

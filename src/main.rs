@@ -1,7 +1,6 @@
 //! Wing is a static site generator which does everything in its power to be *very* fast.
+
 // std
-use std::fs;
-use std::path::Path;
 use std::time::Instant;
 
 // external
@@ -87,7 +86,10 @@ fn main() {
             }
         };
     } else if let Some(v) = app.subcommand_matches("watch") {
-        let port: u16 = v.value_of("port").unwrap().parse().unwrap_or(8000);
+        let port: u16 = match v.value_of("port") {
+            Some(val) => val.parse().unwrap_or(8000),
+            None => 8000,
+        };
         init_watch(v.is_present("silent"), port);
     }
 }
