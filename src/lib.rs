@@ -413,21 +413,21 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
     match message_type {
         "f" => execute!(
             stdout(),
-            SetTitle("Error"),
-            Print(style("ERROR      ").with(Color::Red)),
+            SetTitle("Wing Error"),
+            Print(style("Error      ").with(Color::Red)),
             Print(style(message)),
             Print("\n")
         ),
         "s" => execute!(
             stdout(),
-            Print(style("Success").with(Color::Green)),
+            Print(style("Success    ").with(Color::Green)),
             Print(style(message)),
             Print("\n")
         ),
         "i" => execute!(
             stdout(),
             SetTitle("Indexing"),
-            Print(style("INDEXING").with(Color::Cyan)),
+            Print(style("Indexing   ").with(Color::Cyan)),
             Print(style(message)),
             Print("\n")
         ),
@@ -439,7 +439,7 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
         ),
         "c" => execute!(
             stdout(),
-            Print(style("Completed").with(Color::Green)),
+            Print(style("Completed  ").with(Color::Green)),
             Print(style(message)),
             Print("\n")
         ),
