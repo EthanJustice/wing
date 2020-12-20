@@ -1,5 +1,3 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-
 // std
 use std::path::Path;
 use std::process::exit;
@@ -16,7 +14,7 @@ use rocket::{
 use rocket_contrib::serve::StaticFiles;
 
 // local
-use wing_generate::{build, log};
+use wsg::{build, log};
 
 static NOT_FOUND: &'static str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),

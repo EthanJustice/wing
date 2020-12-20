@@ -4,14 +4,17 @@ use std::fs;
 use std::io::{stdout, BufWriter, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};
+use std::time::SystemTime;
 
 // external
+use chrono::prelude::{DateTime, Utc};
 use crossterm::{
     execute,
     style::{style, Color, Print},
     terminal::SetTitle,
     Result,
 };
+use fs::Metadata;
 use lazy_static::lazy_static;
 use pulldown_cmark::{html, CowStr, Event, Options, Parser};
 use rayon::prelude::*;
@@ -82,6 +85,10 @@ pub struct WingTemplateData {
     pub current: String,
     /// frontmatter
     pub frontmatter: WingTemplateFrontmatter,
+    /// Last time file was modified
+    pub modified: String,
+    /// Time file was created
+    pub created: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -176,6 +183,13 @@ impl WingTemplate {
         let mut html_output = String::new();
         html::push_html(&mut html_output, parser);
 
+        let mut created: DateTime<Utc> = DateTime::<Utc>::from(SystemTime::now());
+        let mut modified: DateTime<Utc> = DateTime::<Utc>::from(SystemTime::now());
+        if let Ok(meta) = fs::metadata(content) {
+            created = DateTime::<Utc>::from(meta.created().unwrap_or(SystemTime::now()));
+            modified = DateTime::<Utc>::from(meta.modified().unwrap_or(SystemTime::now()));
+        }
+
         let ctx = &WingTemplateData {
             content: html_output,
             items: index.clone(),
@@ -185,6 +199,8 @@ impl WingTemplate {
                 .replacen("content\\", "", 1)
                 .replacen(".md", "", 1),
             frontmatter: frontmatter.clone(),
+            created: created.format("%Y-%m-%d %H:%M").to_string(),
+            modified: modified.format("%Y-%m-%d %H:%M").to_string(),
         };
 
         let template = if frontmatter.template.len() == 0 {

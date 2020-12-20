@@ -37,6 +37,7 @@ rocket_contrib = "~0.4.6"
 # other
 open = "~1.4.0"
 lazy_static = "~1.4.0"
+chrono = "~0.4.19"
 
 [profile.release]
 opt-level = 3

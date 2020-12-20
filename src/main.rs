@@ -1,4 +1,5 @@
 //! Wing is a static site generator which does everything in its power to be *very* fast.
+#![feature(proc_macro_hygiene, decl_macro)]
 
 // std
 use std::time::Instant;
@@ -13,7 +14,7 @@ use new::new::generate_new;
 mod watch;
 use watch::watch::init_watch;
 
-use wing_generate::{build, log};
+use wsg::{build, log};
 
 fn main() {
     let total_timing = Instant::now();

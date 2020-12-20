@@ -6,7 +6,7 @@ use std::path::Path;
 use serde_json::to_string_pretty;
 
 // local
-use wing_generate::WingConfig;
+use wsg::WingConfig;
 
 /// Creates a new output directory, where the results of the build process will go
 fn generate_output_dir(name: &str) -> Result<(), std::io::Error> {

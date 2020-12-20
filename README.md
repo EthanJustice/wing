@@ -29,7 +29,7 @@ Since `wing` and `wng` are already taken on `crates.io`, the package's name is `
 
 ```text
 USAGE:
-    wing_generate [SUBCOMMAND]
+    wsg [SUBCOMMAND]
 
 FLAGS:
     -h, --help       Prints help information
