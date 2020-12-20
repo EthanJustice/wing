@@ -33,6 +33,14 @@ fn main() {
                         .long("silent")
                         .short("s")
                         .help("Prevents site being opened in the browser automatically."),
+                )
+                .arg(
+                    Arg::with_name("port")
+                        .long("port")
+                        .short("p")
+                        .help("The port to use.")
+                        .required(false)
+                        .takes_value(true),
                 ),
         )
         .subcommand(
@@ -79,6 +87,7 @@ fn main() {
             }
         };
     } else if let Some(v) = app.subcommand_matches("watch") {
-        init_watch(v.is_present("silent"));
+        let port: u16 = v.value_of("port").unwrap().parse().unwrap_or(8000);
+        init_watch(v.is_present("silent"), port);
     }
 }

@@ -5,14 +5,17 @@ use std::process::exit;
 // crates
 use hotwatch::{Event, Hotwatch};
 use open::that;
-use rocket::{Catcher, Rocket, Route};
+use rocket::{
+    config::{Config, Environment},
+    Catcher, Rocket, Route,
+};
 use rocket_contrib::serve::StaticFiles;
 
 // local
 use wing_generate::{build, log};
 
 /// If `open` is set to true, the site will **not** be opened automatically.
-pub fn init_watch(open: bool) {
+pub fn init_watch(open: bool, port: u16) {
     if Path::new("site/").is_dir() == false {
         log(
             &String::from("Failed to start watching as site directory doesn't exist."),
@@ -33,7 +36,12 @@ pub fn init_watch(open: bool) {
             that("http://localhost:8000").expect("Failed to open in browser.");
         }
 
-        rocket::ignite()
+        let rocket_config = Config::build(Environment::Production)
+            .port(port)
+            .finalize()
+            .unwrap();
+
+        rocket::custom(rocket_config)
             .mount("/static/", StaticFiles::from("static/").rank(-1))
             .mount("/", StaticFiles::from("site/"))
             .launch();
