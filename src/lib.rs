@@ -424,6 +424,13 @@ pub fn log(message: &String, message_type: &str) -> Result<()> {
             Print(style(message)),
             Print("\n")
         ),
+        "starting" => execute!(
+            stdout(),
+            SetTitle("Wing"),
+            Print(style("Starting   ").with(Color::Cyan)),
+            Print(style(message)),
+            Print("\n")
+        ),
         "i" => execute!(
             stdout(),
             SetTitle("Indexing"),
