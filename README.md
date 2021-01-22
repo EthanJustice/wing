@@ -8,6 +8,7 @@
 
 **Note**: `wing` was primarily built for learning purposes. It works as a static site generator, but there are more feature-rich SSGs available.
 
++ [Performance](#performance)
 + [Install](#install)
 + [Usage](#usage)
 
@@ -16,6 +17,26 @@ Todo:
 + tests
 + docs
 + refactor
+
+## Performance
+
+See the latest benchmarks in the [results.txt](./bench/results.txt) file.
+
+Benchmarks were computed on a lower-end laptop.
+
+Benchmark built a site with 10, 100, 1000, and 10,000 source files (that used the same text; each file was 1.54 KB).
+
+The latest results:
+
+```text
+Finished (10): 109ms (.1s)
+
+Finished (100): 486ms (.4s)
+
+Finished (1000): 7399ms (7.3s)
+
+Finished (10000): 201071ms (201s)
+```
 
 ## Install
 

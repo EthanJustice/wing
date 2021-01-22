@@ -36,6 +36,8 @@ pub fn init(open: bool, port: u16) {
         .unwrap();
         exit(1);
     } else {
+        build(None, None);
+
         let mut hw = Hotwatch::new().expect("Failed to initialise file watcher");
         hw.watch("./", |e: Event| {
             if let Event::Write(_path) = e {

@@ -248,7 +248,8 @@ impl WingTemplate {
     }
 }
 
-// build a site
+/// Builds a site
+// todo: return Result, split into smaller functions, tests
 pub fn build(app: Option<&clap::ArgMatches>, total_timing: Option<std::time::Instant>) {
     if Path::new("./site/").is_dir() == true && app.is_some() == true {
         if app
@@ -368,7 +369,7 @@ pub fn build(app: Option<&clap::ArgMatches>, total_timing: Option<std::time::Ins
 
     if let Some(timing) = total_timing {
         log(
-            &format!("completed building in {}ms", timing.elapsed().as_millis(),),
+            &format!("completed building in {}ms", timing.elapsed().as_millis()),
             "s",
         )
         .unwrap();

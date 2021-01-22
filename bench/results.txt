@@ -1,0 +1,7 @@
+Finished (10): 109ms (.1s)
+
+Finished (100): 486ms (.4s)
+
+Finished (1000): 7399ms (7.3s)
+
+Finished (10000): 201071ms (201s)
